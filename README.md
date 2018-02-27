@@ -2,6 +2,10 @@
 ### Larissa Laich, Lukas Jendele, Michael Wiegner, Ondrej Skopek
 Department of Computer Science, ETH Zurich, Switzerland
 
+## Project links
+
+TODO: Add links to Drive data, Drive notebooks for exploration, DNNs, data preprocessing, etc
+
 ## Project definition
 The use of microblogging and text messaging as a media of communication has greatly increased over the past 10 years. Such large volumes of data amplifies the need for automatic methods to understand the opinion conveyed in a text.
 
