@@ -22,7 +22,7 @@ class missingdict(dict):
 class CILDataset:
     """Class capable of loading CIL Twitter dataset."""
 
-    def __init__(self, line_words, lines, sentiments, train=None):
+    def __init__(self, lines, sentiments, word_vocab=None, train=None):
         """Load dataset from the given files.
 
         Arguments:
@@ -34,45 +34,28 @@ class CILDataset:
             self._vocabulary_maps = train._vocabulary_maps
         else:
             self._vocabulary_maps = {'chars': {'$pad$': 0, '$unk$': 1},
-                                     'words': {0: 0, 1: 1}, # pad = 0, unk = 1
                                      'sentiments': {0: 0, 1: 1}}
+            if word_vocab:
+                self._vocabulary_maps['words'] = word_vocab
+            else:
+                self._vocabulary_maps['words'] = {0: 0, 1: 1}, # pad = 0, unk = 1
+
         self._word_ids = []
-        self._word_lens = []
         self._charseq_ids = []
-        self._charseq_lens = []
         self._charseqs_map = {'$pad$': 0}
         self._charseqs = []
         self._sentiments = []
 
-        # Load the sentences (words)
-        for idx, line in enumerate(line_words):
-            if sentiments: # not test
+        # Load the sentences
+        for idx, line in enumerate(lines):
+            if sentiments: # if not test
                 sentiment = sentiments[idx]
+                assert sentiment in self._vocabulary_maps['sentiments']
                 self._sentiments.append(self._vocabulary_maps['sentiments'][sentiment])
 
             self._word_ids.append([])
-            for word in line:
-
-                # Words
-                if word not in self._vocabulary_maps['words']:
-                    if not train:
-                        self._vocabulary_maps['words'][word] = len(self._vocabulary_maps['words'])
-                    else:
-                        word = '$unk$'
-                self._word_ids[-1].append(self._vocabulary_maps['words'][word])
-
-        # Compute sentence lengths
-        sentences = len(self._word_ids)
-        self._word_lens = np.zeros([sentences], np.int32)
-        for i in range(sentences):
-            self._word_lens[i] = len(self._word_ids[i])
-
-        # Load the sentences
-        for idx, line in enumerate(lines):
             self._charseq_ids.append([])
             for word in line:
-                assert len(word)
-
                 # Characters
                 if word not in self._charseqs_map:
                     self._charseqs_map[word] = len(self._charseqs)
@@ -86,11 +69,14 @@ class CILDataset:
                         self._charseqs[-1].append(self._vocabulary_maps['chars'][c])
                 self._charseq_ids[-1].append(self._charseqs_map[word])
 
+                # Words -- missingdict handles unks automatically
+                self._word_ids[-1].append(self._vocabulary_maps['words'][word])
+
         # Compute sentence lengths
-        sentences = len(self._charseq_ids)
-        self._charseq_lens = np.zeros([sentences], np.int32)
+        sentences = len(self._word_ids)
+        self._sentence_lens = np.zeros([sentences], np.int32)
         for i in range(sentences):
-            self._charseq_lens[i] = len(self._charseq_ids[i])
+            self._sentence_lens[i] = len(self._word_ids[i])
 
         # Create vocabularies
         if train:
@@ -102,8 +88,7 @@ class CILDataset:
                 for word, id in words.items():
                     self._vocabularies[feature][id] = word
 
-        assert len(self._word_lens) == len(self._charseq_lens)
-        self._permutation = np.random.permutation(len(self._word_lens))
+        self._permutation = np.random.permutation(len(self._sentence_lens))
 
         
     def vocabulary(self, feature):
@@ -147,7 +132,7 @@ class CILDataset:
 
     def epoch_finished(self):
         if len(self._permutation) == 0:
-            self._permutation = np.random.permutation(len(self._word_lens))
+            self._permutation = np.random.permutation(len(self._sentence_lens))
             return True
         return False
 
@@ -156,28 +141,26 @@ class CILDataset:
 
         Returns the same results as next_batch.
         """
-        return self._next_batch(np.arange(len(self._word_lens)))
+        return self._next_batch(np.arange(len(self._sentence_lens)))
 
     def _next_batch(self, batch_perm):
         batch_size = len(batch_perm)
 
         # General data
-        batch_word_lens = self._word_lens[batch_perm]
-        max_word_len = np.max(batch_word_lens)
-        batch_charseq_lens = self._charseq_lens[batch_perm]
-        max_charseq_len = np.max(batch_charseq_lens)
+        batch_sentence_lens = self._sentence_lens[batch_perm]
+        max_sentence_len = np.max(batch_sentence_lens)
 
         # Word-level data
-        batch_word_ids = np.zeros([batch_size, max_word_len], np.int32)
+        batch_word_ids = np.zeros([batch_size, max_sentence_len], np.int32)
         for i in range(batch_size):
-            batch_word_ids[i, 0:batch_word_lens[i]] = self._word_ids[batch_perm[i]]
+            batch_word_ids[i, 0:batch_sentence_lens[i]] = self._word_ids[batch_perm[i]]
         
         batch_sentiments = np.zeros([batch_size], np.int32)
         for i in range(batch_size):
             batch_sentiments[i] = self._sentiments[batch_perm[i]]
 
         # Character-level data
-        batch_charseq_ids = np.zeros([batch_size, max_charseq_len], np.int32)
+        batch_charseq_ids = np.zeros([batch_size, max_sentence_len], np.int32)
         charseqs_map, charseqs, charseq_lens = {}, [], []
         for i in range(batch_size):
             for j, charseq_id in enumerate(self._charseq_ids[batch_perm[i]]):
@@ -191,14 +174,14 @@ class CILDataset:
         for i in range(len(charseqs)):
             batch_charseqs[i, 0:len(charseqs[i])] = charseqs[i]
 
-        return batch_word_lens, batch_word_ids, batch_charseq_ids, batch_charseqs, batch_charseq_lens, batch_sentiments
+        return batch_sentence_lens, batch_word_ids, batch_charseq_ids, batch_charseqs, batch_charseq_lens, batch_sentiments
 
 class Preprocessing(object):
     methods = None
 
     PAD_SYMBOL = "$pad$"
     UNK_SYMBOL = "$unk$"
-    BASE_VOCAB = {UNK_SYMBOL: 1, PAD_SYMBOL: 0}
+    BASE_VOCAB = {PAD_SYMBOL: 0, UNK_SYMBOL: 1}
 
     def __init__(self, standardize=True, normalize=True, rem_numbers=True, punct_squash=True, fix_slang=True, word_squash=True, expl_negations=True, rem_stopwords=True, stemming=nltk.stem.PorterStemmer, lemmatization=nltk.stem.WordNetLemmatizer, padding_size=40):
         self.padding_size = padding_size
@@ -242,19 +225,9 @@ class Preprocessing(object):
 
     def lines_to_matrix(self, lines, labels, args):
         lines = list(lines)
-        data = np.full((len(lines), self.padding_size), "$pad$", dtype=object)
-
-        cut_counter = 0
         for i, line in enumerate(lines):
-            strs = np.asarray(line.split()).astype(object)
-            fin_len = min(self.padding_size, len(strs))
-            data[i, :fin_len] = strs[:fin_len]
-            if len(strs) > self.padding_size:
-                cut_counter += 1
-
-        if cut_counter > 0:
-            print("WARNING: Cut {} sentences to length {}.".format(cut_counter, self.padding_size))
-        return data, labels
+            lines[i] = line.split()
+        return lines, labels
 
     def punct_squash(self, lines, labels, args):
         return lines, labels
@@ -277,12 +250,20 @@ class Preprocessing(object):
     def lemmatization(self, lines, labels, args):
         return lines, labels
 
-    def _vocab_downsize_dict(self, lines, vocab):
+    def _vocab_downsize_dict(self, lines, vocab, inv_vocab):
         lines = np.asarray(lines)
-        # data = np.zeros((len(lines), self.padding_size), dtype=np.int32)
-        map_vocab = np.vectorize(lambda word: vocab[word])
-        data = map_vocab(lines)
-        data = data.astype(np.int32)
+        data = np.full((len(lines), self.padding_size), "$pad$", dtype=object)
+        cut_counter = 0
+        for i, line in enumerate(lines):
+            strs = np.asarray(line).astype(object)
+            fin_len = min(self.padding_size, len(strs))
+            data[i, :fin_len] = strs[:fin_len]
+            if len(strs) > self.padding_size:
+                cut_counter += 1
+        if cut_counter > 0:
+            print("WARNING: Cut {} sentences to length {}.".format(cut_counter, self.padding_size))
+
+        data = np.vectorize(lambda word: inv_vocab[vocab[word]])(data)
         return data
 
     def _vocab_downsize_tosize(self, lines, vocab_size):
@@ -292,7 +273,9 @@ class Preprocessing(object):
 
         vocab = dict(self.BASE_VOCAB)
         uid = len(self.BASE_VOCAB)
+        
         for word, _ in counter.most_common(vocab_size - len(self.BASE_VOCAB)):
+            assert word not in vocab
             vocab[word] = uid
             uid += 1
 
@@ -302,11 +285,9 @@ class Preprocessing(object):
         if isinstance(vocab_downsize, int):
             vocab = self._vocab_downsize_tosize(lines, vocab_downsize)
             inv_vocab = {v: k for k, v in vocab.items()}
-            return self._vocab_downsize_dict(lines, vocab), vocab, inv_vocab
-        elif isinstance(vocab_downsize, dict):
-            return self._vocab_downsize_dict(lines, vocab_downsize)
+            return vocab, inv_vocab
         else:
-            raise ValueError("Unknown type of argument: {}".format(vocab_downsize))
+            return self._vocab_downsize_dict(lines, *vocab_downsize)
 
 from sklearn.model_selection import train_test_split
 
@@ -362,28 +343,29 @@ class Datasets(object):
         X_test, _ = self.preprocessing.transform(X_test, labels=None)
         
         print("Generating vocabulary...")
-        X_train_word, word_vocab, inv_word_vocab = self.preprocessing.vocab(X_train, vocab_downsize=self.vocab_size)
-        X_eval_word = self.preprocessing.vocab(X_eval, vocab_downsize=word_vocab)
-        X_test_word = self.preprocessing.vocab(X_test, vocab_downsize=word_vocab)
+        word_vocab, inv_word_vocab = self.preprocessing.vocab(X_train, vocab_downsize=self.vocab_size)
+        # X_train_word = self.preprocessing.vocab(X_train, vocab_downsize=(word_vocab, inv_word_vocab))
+        # X_eval_word = self.preprocessing.vocab(X_eval, vocab_downsize=(word_vocab, inv_word_vocab))
+        # X_test_word = self.preprocessing.vocab(X_test, vocab_downsize=(word_vocab, inv_word_vocab))
 
         self.X_train = X_train
-        self.X_train_word = X_train_word
+        # self.X_train_word = X_train_word
         self.y_train = y_train
 
         self.X_eval = X_eval
-        self.X_eval_word = X_eval_word
+        # self.X_eval_word = X_eval_word
         self.y_eval = y_eval
 
         self.X_test = X_test
-        self.X_test_word = X_test_word
+        # self.X_test_word = X_test_word
 
         self.word_vocab = word_vocab
         self.inv_word_vocab = inv_word_vocab
 
         print("Generating TF data...")
-        self.data_train = CILDataset(X_train_word, X_train, y_train)
-        self.data_eval = CILDataset(X_eval_word, X_eval, y_eval, train=self.data_train)
-        self.data_test = CILDataset(X_test_word, X_test, None, train=self.data_train)
+        self.data_train = CILDataset(X_train, y_train, word_vocab=self.word_vocab)
+        self.data_eval = CILDataset(X_eval, y_eval, train=self.data_train)
+        self.data_test = CILDataset(X_test, None, train=self.data_train)
 
     def batches_per_epoch_generator(self, batch_size, data=None, shuffle=True):
         if data is None:
@@ -425,15 +407,15 @@ if __name__ == "__main__":
         return counts[UNK] / sum(counts.values())
 
     print("X_train\t\t", data.X_train[idx][idx2])
-    print("X_train_word\t", data.inv_word_vocab[data.X_train_word[idx, idx2]])
-    print("X_train_wordUNK\t", unk_percentage(data.X_train_word))
+    # print("X_train_word\t", data.X_train_word[idx, idx2])
+    print(f"X_train_wordUNK\t {unk_percentage(data.data_train._word_ids)}")
     print("y_train\t\t", data.y_train[idx])
 
     print("X_eval\t\t", data.X_eval[idx][idx2])
-    print("X_eval_word\t", data.inv_word_vocab[data.X_eval_word[idx, idx2]])
-    print("X_train_wordUNK\t", unk_percentage(data.X_eval_word))
+    # print("X_eval_word\t", data.X_eval_word[idx, idx2])
+    print(f"X_eval_wordUNK\t {unk_percentage(data.data_eval._word_ids)}")
     print("y_eval\t\t", data.y_eval[idx])
 
     print("X_test\t\t", data.X_test[idx][idx2])
-    print("X_test_word\t", data.inv_word_vocab[data.X_test_word[idx, idx2]])
-    print("X_train_wordUNK\t", unk_percentage(data.X_test_word))
+    # print("X_test_word\t", data.X_test_word[idx, idx2])
+    print(f"X_test_wordUNK\t {unk_percentage(data.data_test._word_ids)}")
