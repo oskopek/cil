@@ -4,6 +4,8 @@ import re
 import numpy as np
 import nltk
 
+from sklearn.model_selection import train_test_split
+
 # from nltk.stem.api import StemmerI
 # from nltk.stem.regexp import RegexpStemmer
 # from nltk.stem.lancaster import LancasterStemmer
@@ -15,9 +17,9 @@ import nltk
 
 SEED = 42
 
+
 # Replace missing values with the default value, but do not insert them.
 class missingdict(dict):
-
     def __init__(self, *args, default_val=None, **kwargs):
         super(missingdict, self).__init__(*args, **kwargs)
         self.default_val = default_val
@@ -40,22 +42,22 @@ class CILDataset:
         if train:
             self._vocabulary_maps = train._vocabulary_maps
         else:
-            self._vocabulary_maps = {'chars': {'$pad$': 0, '$unk$': 1},
-                                     'sentiments': {0: 0, 1: 1}}
+            self._vocabulary_maps = {'chars': {'$pad$': 0, '$unk$': 1}, 'sentiments': {0: 0, 1: 1}}
             if word_vocab:
                 self._vocabulary_maps['words'] = word_vocab
             else:
-                self._vocabulary_maps['words'] = {0: 0, 1: 1}, # pad = 0, unk = 1
+                self._vocabulary_maps['words'] = {0: 0, 1: 1},  # pad = 0, unk = 1
 
         self._word_ids = []
         self._charseq_ids = []
         self._charseqs_map = {'$pad$': 0}
         self._charseqs = []
-        self._sentiments = []
+        if sentiments:
+            self._sentiments = []
 
         # Load the sentences
         for idx, line in enumerate(lines):
-            if sentiments: # if not test
+            if sentiments:  # if not test
                 sentiment = sentiments[idx]
                 assert sentiment in self._vocabulary_maps['sentiments']
                 self._sentiments.append(self._vocabulary_maps['sentiments'][sentiment])
@@ -70,7 +72,8 @@ class CILDataset:
                     for c in word:
                         if c not in self._vocabulary_maps['chars']:
                             if not train:
-                                self._vocabulary_maps['chars'][c] = len(self._vocabulary_maps['chars'])
+                                self._vocabulary_maps['chars'][c] = len(
+                                    self._vocabulary_maps['chars'])
                             else:
                                 c = '$unk$'
                         self._charseqs[-1].append(self._vocabulary_maps['chars'][c])
@@ -97,7 +100,6 @@ class CILDataset:
 
         self._permutation = np.random.permutation(len(self._sentence_lens))
 
-        
     def vocabulary(self, feature):
         """Return vocabulary for required feature.
 
@@ -161,10 +163,13 @@ class CILDataset:
         batch_word_ids = np.zeros([batch_size, max_sentence_len], np.int32)
         for i in range(batch_size):
             batch_word_ids[i, 0:batch_sentence_lens[i]] = self._word_ids[batch_perm[i]]
-        
-        batch_sentiments = np.zeros([batch_size], np.int32)
-        for i in range(batch_size):
-            batch_sentiments[i] = self._sentiments[batch_perm[i]]
+
+        if self._sentiments:  # not test
+            batch_sentiments = np.zeros([batch_size], np.int32)
+            for i in range(batch_size):
+                batch_sentiments[i] = self._sentiments[batch_perm[i]]
+        else:
+            batch_sentiments = None
 
         # Character-level data
         batch_charseq_ids = np.zeros([batch_size, max_sentence_len], np.int32)
@@ -183,6 +188,7 @@ class CILDataset:
 
         return batch_sentence_lens, batch_word_ids, batch_charseq_ids, batch_charseqs, batch_charseq_lens, batch_sentiments
 
+
 class Preprocessing(object):
     methods = None
 
@@ -190,36 +196,42 @@ class Preprocessing(object):
     UNK_SYMBOL = "$unk$"
     BASE_VOCAB = {PAD_SYMBOL: 0, UNK_SYMBOL: 1}
 
-    def __init__(self, standardize=True,
-                 segment_hashtags=10, contractions=True, rem_numbers=True, punct_squash=True, fix_slang=True,
-                 word_squash=3,
-                 expl_negations=False, rem_stopwords=False,
-                 stemming=nltk.stem.PorterStemmer(),
-                #  stemming=None,
-                #  lemmatization=nltk.stem.WordNetLemmatizer(),
-                 lemmatization=None,
-                 padding_size=40):
+    def __init__(
+            self,
+            standardize=True,
+            segment_hashtags=10,
+            contractions=True,
+            rem_numbers=True,
+            punct_squash=True,
+            fix_slang=True,
+            word_squash=3,
+            expl_negations=False,
+            rem_stopwords=False,
+            stemming=nltk.stem.PorterStemmer(),
+            #  stemming=None,
+            #  lemmatization=nltk.stem.WordNetLemmatizer(),
+            lemmatization=None,
+            padding_size=40):
         self.padding_size = padding_size
         self.methods = [
-                # line operations
-                (self.standardize, standardize),
-                (self.word_squash, word_squash),
-                (self.segment_hashtags, segment_hashtags),
-                (self.fix_slang, fix_slang),
-                (self.contractions, contractions),
-                (self.rem_numbers, rem_numbers),
-                (self.punct_squash, punct_squash),
+            # line operations
+            (self.standardize, standardize),
+            (self.word_squash, word_squash),
+            (self.segment_hashtags, segment_hashtags),
+            (self.fix_slang, fix_slang),
+            (self.contractions, contractions),
+            (self.rem_numbers, rem_numbers),
+            (self.punct_squash, punct_squash),
+            (self.lines_to_matrix, True),
 
-                (self.lines_to_matrix, True),
-                
-                # matrix operations
-                (self.expl_negations, expl_negations),
-                (self.rem_stopwords, rem_stopwords),
-                (self.stemming, stemming),
-                (self.lemmatization, lemmatization)
+            # matrix operations
+            (self.expl_negations, expl_negations),
+            (self.rem_stopwords, rem_stopwords),
+            (self.stemming, stemming),
+            (self.lemmatization, lemmatization)
         ]
 
-    def transform(self, lines, labels=None): # labels == None => test transformation
+    def transform(self, lines, labels=None):  # labels == None => test transformation
         for fn, args in self.methods:
             # assert len(lines) == len(labels)
             if args:
@@ -240,7 +252,7 @@ class Preprocessing(object):
             (r" ([a-z]+)'ve ", r" \1 have "),
             (r" (i|you|he|she|it|we|they|u)'d ", r" \1 would "),
             (r" (how|why|where|what)'d ", r" \1 did "),
-            (r" ([a-z]+)'d ", r" \1 "), # just remove it here "lol'd"
+            (r" ([a-z]+)'d ", r" \1 "),  # just remove it here "lol'd"
         ]
 
         re_map = [(re.compile(x), y) for x, y in re_map]
@@ -271,7 +283,7 @@ class Preprocessing(object):
         def pdist(counter):
             "Make a probability distribution, given evidence from a Counter."
             N = sum(counter.values())
-            return lambda x: counter[x]/N
+            return lambda x: counter[x] / N
 
         P = pdist(COUNTS)
 
@@ -288,18 +300,15 @@ class Preprocessing(object):
 
         def splits(text, start=0, L=20):
             "Return a list of all (first, rest) pairs; start <= len(first) <= L."
-            return [(text[:i], text[i:]) 
-                    for i in range(start, min(len(text), L)+1)]
+            return [(text[:i], text[i:]) for i in range(start, min(len(text), L) + 1)]
 
         def segment(text):
             "Return a list of words that is the most probable segmentation of text."
-            if not text: 
+            if not text:
                 return []
             else:
-                candidates = ([first] + segment(rest) 
-                            for (first, rest) in splits(text, 1))
+                candidates = ([first] + segment(rest) for (first, rest) in splits(text, 1))
                 return max(candidates, key=Pwords)
-
 
         num_pattern = re.compile(r'# ')
         two_pattern = re.compile(r'([^0-9])2([^0-9])')
@@ -318,12 +327,12 @@ class Preprocessing(object):
                     hashtag = hashtag.group(0)[1:].strip()
                     # print(hashtag)
                     if hashtag not in hmap:
-                        if len(hashtag) > limit: # TODO: increase this number
-                #           print("Ignoring segmentation of '{}' (too long)".format(hashtag))
+                        if len(hashtag) > limit:  # TODO: increase this number
+                            #           print("Ignoring segmentation of '{}' (too long)".format(hashtag))
                             continue
-                        
+
                         segmented = segment(hashtag)
-                        if len(segmented) >= len(hashtag)/3*2:
+                        if len(segmented) >= len(hashtag) / 3 * 2:
                             # print("Ignoring segmentation '{}' of '{}'".format(segmented, hashtag))
                             hmap[hashtag] = hashtag
                         else:
@@ -364,9 +373,11 @@ class Preprocessing(object):
     def punct_squash(self, lines, labels, args):
         pattern = re.compile(r"([^a-z0-9] ?)\1+")
         repl = r" \1 "
+
         def gen_punct_squash(lines):
             for line in lines:
                 yield re.sub(pattern, repl, line)
+
         return gen_punct_squash(lines), labels
 
     def fix_slang(self, lines, labels, args):
@@ -391,7 +402,7 @@ class Preprocessing(object):
             (r"&", " and "),
             (r"pl[sz]+", " please "),
             (r"\.\.\.", " $three_dots$ "),
-            (r"\.\.", " $three_dots$ "), # even though they are two
+            (r"\.\.", " $three_dots$ "),  # even though they are two
         ]
 
         re_map = [(re.compile(x), y) for x, y in re_map]
@@ -434,6 +445,7 @@ class Preprocessing(object):
     def word_squash(self, lines, labels, args):
         squash = str(args - 1)
         three_chars = re.compile(r"(\w)\1{" + squash + ",}")
+
         def squash_gen(lines):
             for line in lines:
                 yield re.sub(three_chars, r"\1", line)
@@ -445,8 +457,7 @@ class Preprocessing(object):
         return lines, labels
 
     def rem_stopwords(self, lines, labels, args):
-        from nltk.corpus import stopwords
-        stop_words = set(stopwords.words('english'))
+        stop_words = set(nltk.corpus.stopwords.words('english'))
 
         def gen_stopwords(lines):
             for i, line in enumerate(lines):
@@ -468,6 +479,7 @@ class Preprocessing(object):
                     new_line.append(stemmed)
                 lines[i] = new_line
             return lines
+
         return gen_stem(lines), labels
 
     def lemmatization(self, lines, labels, lemmatizer):
@@ -479,6 +491,7 @@ class Preprocessing(object):
                     new_line.append(lemma)
                 lines[i] = new_line
             return lines
+
         return gen_lemma(lines), labels
 
     def _vocab_downsize_dict(self, lines, vocab, inv_vocab):
@@ -504,13 +517,13 @@ class Preprocessing(object):
 
         vocab = dict(self.BASE_VOCAB)
         uid = len(self.BASE_VOCAB)
-        
+
         for word, _ in counter.most_common(vocab_size - len(self.BASE_VOCAB)):
             assert word not in vocab
             vocab[word] = uid
             uid += 1
 
-        return missingdict(vocab[self.UNK_SYMBOL], vocab)
+        return missingdict(vocab, default_val=vocab[self.UNK_SYMBOL])
 
     def vocab(self, lines, vocab_downsize):
         if isinstance(vocab_downsize, int):
@@ -520,7 +533,6 @@ class Preprocessing(object):
         else:
             return self._vocab_downsize_dict(lines, *vocab_downsize)
 
-from sklearn.model_selection import train_test_split
 
 class Datasets(object):
     X_train = None
@@ -539,7 +551,14 @@ class Datasets(object):
     data_eval = None
     data_test = None
 
-    def __init__(self, train_pos_file, train_neg_file, test_file, eval_size=0.33, random_state=42, preprocessing=Preprocessing(), vocab_size=20000):
+    def __init__(self,
+                 train_pos_file,
+                 train_neg_file,
+                 test_file,
+                 eval_size=0.33,
+                 random_state=42,
+                 preprocessing=Preprocessing(),
+                 vocab_size=20000):
         self.train_pos_file = train_pos_file
         self.train_neg_file = train_neg_file
         self.test_file = test_file
@@ -563,18 +582,20 @@ class Datasets(object):
         del X_train_pos, X_train_neg
 
         X_test = Datasets._read_lines(self.test_file)
-        X_test = [line.split(sep=',', maxsplit=1)[1] for line in X_test] # remove numbers
+        X_test = [line.split(sep=',', maxsplit=1)[1] for line in X_test]  # remove numbers
 
         print("Splitting...")
-        X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train, test_size=self.eval_size, random_state=self.random_state)
+        X_train, X_eval, y_train, y_eval = train_test_split(
+            X_train, y_train, test_size=self.eval_size, random_state=self.random_state)
 
         print("Preprocessing...")
         X_train, y_train = self.preprocessing.transform(X_train, labels=y_train)
         X_eval, y_eval = self.preprocessing.transform(X_eval, labels=y_eval)
         X_test, _ = self.preprocessing.transform(X_test, labels=None)
-        
+
         print("Generating vocabulary...")
-        word_vocab, inv_word_vocab = self.preprocessing.vocab(X_train, vocab_downsize=self.vocab_size)
+        word_vocab, inv_word_vocab = self.preprocessing.vocab(
+            X_train, vocab_downsize=self.vocab_size)
         # X_train_word = self.preprocessing.vocab(X_train, vocab_downsize=(word_vocab, inv_word_vocab))
         # X_eval_word = self.preprocessing.vocab(X_eval, vocab_downsize=(word_vocab, inv_word_vocab))
         # X_test_word = self.preprocessing.vocab(X_test, vocab_downsize=(word_vocab, inv_word_vocab))
@@ -609,7 +630,7 @@ class Datasets(object):
             train_permutation = np.arange(n_rows)
 
         for i in range(0, n_rows, batch_size):
-            batch = data[train_permutation[i: i + batch_size]]
+            batch = data[train_permutation[i:i + batch_size]]
             if len(batch) == 0:
                 raise StopIteration
             else:
@@ -619,8 +640,14 @@ class Datasets(object):
 if __name__ == "__main__":
     PREFIX = "../data_in/twitter-datasets/"
     EVAL_SIZE = 0.33
-    # data = Datasets(train_pos_file=PREFIX + "train_pos_full.txt", train_neg_file=PREFIX + "train_pos_full.txt", test_file=PREFIX + "test_data.txt", eval_size=EVAL_SIZE, vocab_size=20000)
-    data = Datasets(train_pos_file=PREFIX + "train_pos.txt", train_neg_file=PREFIX + "train_pos.txt", test_file=PREFIX + "test_data.txt", eval_size=EVAL_SIZE, vocab_size=20000)
+    data = Datasets(
+        # train_pos_file=PREFIX + "train_pos_full.txt",
+        train_pos_file=PREFIX + "train_pos.txt",
+        # train_neg_file=PREFIX + "train_neg_full.txt",
+        train_neg_file=PREFIX + "train_neg.txt",
+        test_file=PREFIX + "test_data.txt",
+        eval_size=EVAL_SIZE,
+        vocab_size=20000)
     data.load()
 
     idx = 100
@@ -629,7 +656,7 @@ if __name__ == "__main__":
     print("vocab words tf\t", len(data.data_train.vocabulary('words')))
     print("vocab chars tf\t", len(data.data_train.vocabulary('chars')))
     print("vocab sent tf \t", data.data_train.vocabulary('sentiments'))
-    
+
     def unk_percentage(X_words):
         UNK = 1
         counts = Counter()
@@ -650,3 +677,13 @@ if __name__ == "__main__":
     print("X_test\t\t", data.X_test[idx][idx2])
     # print("X_test_word\t", data.X_test_word[idx, idx2])
     print(f"X_test_wordUNK\t {unk_percentage(data.data_test._word_ids)}")
+
+    def print_data(data, strr):
+        print(strr, "dataX", len(data._word_ids), len(data._charseq_ids))
+        if data._sentiments:
+            print(strr, "dataY", len(data._sentiments))
+        print(strr, "lens", len(data._sentence_lens))
+
+    print_data(data.data_train, "train")
+    print_data(data.data_eval, "eval")
+    print_data(data.data_test, "test")
