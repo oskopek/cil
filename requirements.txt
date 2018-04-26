@@ -1,0 +1,9 @@
+tensorflow-gpu==1.7.0
+tensorboard==1.7.0
+numpy
+scipy
+pandas
+matplotlib
+sklearn
+nltk
+ipython
