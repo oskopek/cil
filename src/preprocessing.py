@@ -37,6 +37,7 @@ class CILDataset:
         Arguments:
         train: If given, the vocabularies from the training data will be reused.
         """
+        self.is_train = train is None  # if train is none, this dataset is the training one
 
         # Create vocabulary_maps
         if train:
@@ -98,7 +99,13 @@ class CILDataset:
                 for word, id in words.items():
                     self._vocabularies[feature][id] = word
 
-        self._permutation = np.random.permutation(len(self._sentence_lens))
+        self._new_permutation()
+
+    def _new_permutation(self):
+        if self.is_train:
+            self._permutation = np.random.permutation(len(self._sentence_lens))
+        else:
+            self._permutation = np.arange(len(self._sentence_lens))
 
     def vocabulary(self, feature):
         """Return vocabulary for required feature.
@@ -141,7 +148,7 @@ class CILDataset:
 
     def epoch_finished(self):
         if len(self._permutation) == 0:
-            self._permutation = np.random.permutation(len(self._sentence_lens))
+            self._new_permutation()
             return True
         return False
 
@@ -164,7 +171,7 @@ class CILDataset:
         for i in range(batch_size):
             batch_word_ids[i, 0:batch_sentence_lens[i]] = self._word_ids[batch_perm[i]]
 
-        if self._sentiments:  # not test
+        if hasattr(self, '_sentiments'):  # not test
             batch_sentiments = np.zeros([batch_size], np.int32)
             for i in range(batch_size):
                 batch_sentiments[i] = self._sentiments[batch_perm[i]]
@@ -639,7 +646,7 @@ class Datasets(object):
 
 if __name__ == "__main__":
     PREFIX = "../data_in/twitter-datasets/"
-    EVAL_SIZE = 0.33
+    EVAL_SIZE = 0.25
     data = Datasets(
         # train_pos_file=PREFIX + "train_pos_full.txt",
         train_pos_file=PREFIX + "train_pos.txt",
@@ -680,7 +687,7 @@ if __name__ == "__main__":
 
     def print_data(data, strr):
         print(strr, "dataX", len(data._word_ids), len(data._charseq_ids))
-        if data._sentiments:
+        if hasattr(data, '_sentiments'):
             print(strr, "dataY", len(data._sentiments))
         print(strr, "lens", len(data._sentence_lens))
 
