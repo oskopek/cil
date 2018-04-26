@@ -20,10 +20,10 @@ FLAGS = flags.FLAGS
 PREFIX = "data_in/twitter-datasets/"
 EVAL_SIZE = 0.25
 data = Datasets(
-    # train_pos_file=PREFIX + "train_pos_full.txt",
-    train_pos_file=PREFIX + "train_pos.txt",
-    # train_neg_file=PREFIX + "train_neg_full.txt",
-    train_neg_file=PREFIX + "train_neg.txt",
+    train_pos_file=PREFIX + "train_pos_full.txt",
+    # train_pos_file=PREFIX + "train_pos.txt",
+    train_neg_file=PREFIX + "train_neg_full.txt",
+    # train_neg_file=PREFIX + "train_neg.txt",
     test_file=PREFIX + "test_data.txt",
     eval_size=EVAL_SIZE,
     vocab_size=20000)
@@ -69,7 +69,7 @@ print_data(data.data_test, "test")
 
 
 # Construct the network
-print("Constructing the network.", file=sys.stderr)
+print("Constructing the network.", flush=True)
 expname = "{}{}-bs{}-epochs{}-char{}-word{}".format(FLAGS.rnn_cell, FLAGS.rnn_cell_dim,
                                                     FLAGS.batch_size, FLAGS.epochs,
                                                     FLAGS.char_embedding, FLAGS.word_embedding)
@@ -94,13 +94,12 @@ best_eval_accuracy = 0
 test_predictions = None
 
 for epoch in range(FLAGS.epochs):
-    print("Training epoch {}".format(epoch + 1), file=sys.stderr)
+    print("Training epoch {}".format(epoch + 1), flush=True)
     network.train_epoch(data.data_train)
     eval_accuracy, eval_loss = network.evaluate_epoch(data.data_eval, "eval")
     print(
         "Evaluation accuracy after epoch {} is {:.2f}. Eval loss is {:.2f}".format(
-            epoch + 1, 100. * eval_accuracy, eval_loss),
-        file=sys.stderr)
+            epoch + 1, 100. * eval_accuracy, eval_loss), flush=True)
 
     if eval_accuracy > best_eval_accuracy:
         best_eval_accuracy = eval_accuracy
@@ -116,6 +115,6 @@ for epoch in range(FLAGS.epochs):
                         i + 1,
                         int(data.data_test.vocabulary('sentiments')[prediction]) * 2 - 1),
                     file=f)
-        print("Exported predictions to", out_file)
-        print()
+        print("Exported predictions to", out_file, flush=True)
+        print(flush=True)
 print("End.")

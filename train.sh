@@ -4,5 +4,5 @@ set -e
 source venv/bin/activate
 
 echo "Training..."
-exec python -m cil.train
+exec python -m cil.train 2>&1
 
