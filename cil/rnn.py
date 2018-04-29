@@ -12,6 +12,7 @@ import tensorflow.contrib.summary as tf_summary
 import cil.flags as flags
 FLAGS = flags.FLAGS
 
+
 class Network:
     CLASSES = 2
 

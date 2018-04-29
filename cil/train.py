@@ -36,12 +36,14 @@ print("vocab words tf\t", len(data.data_train.vocabulary('words')))
 print("vocab chars tf\t", len(data.data_train.vocabulary('chars')))
 print("vocab sent tf \t", data.data_train.vocabulary('sentiments'))
 
+
 def unk_percentage(X_words):
     UNK = 1
     counts = Counter()
     for line in X_words:
         counts.update(line)
     return counts[UNK] / sum(counts.values())
+
 
 print("X_train\t\t", data.X_train[idx][idx2])
 # print("X_train_word\t", data.X_train_word[idx, idx2])
@@ -57,16 +59,17 @@ print("X_test\t\t", data.X_test[idx][idx2])
 # print("X_test_word\t", data.X_test_word[idx, idx2])
 print(f"X_test_wordUNK\t {unk_percentage(data.data_test._word_ids)}")
 
+
 def print_data(data, strr):
     print(strr, "dataX", len(data._word_ids), len(data._charseq_ids))
     if hasattr(data, '_sentiments'):
         print(strr, "dataY", len(data._sentiments))
     print(strr, "lens", len(data._sentence_lens))
 
+
 print_data(data.data_train, "train")
 print_data(data.data_eval, "eval")
 print_data(data.data_test, "test")
-
 
 # Construct the network
 print("Constructing the network.", flush=True)
@@ -99,7 +102,8 @@ for epoch in range(FLAGS.epochs):
     eval_accuracy, eval_loss = network.evaluate_epoch(data.data_eval, "eval")
     print(
         "Evaluation accuracy after epoch {} is {:.2f}. Eval loss is {:.2f}".format(
-            epoch + 1, 100. * eval_accuracy, eval_loss), flush=True)
+            epoch + 1, 100. * eval_accuracy, eval_loss),
+        flush=True)
 
     if eval_accuracy > best_eval_accuracy:
         best_eval_accuracy = eval_accuracy

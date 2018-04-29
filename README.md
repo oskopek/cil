@@ -50,3 +50,25 @@ Note that all tweets have been tokenized already, so that the words and punctuat
 
 Source: https://link.springer.com/chapter/10.1007%2F978-3-319-67008-9_31 Effrosynidis D., Symeonidis S., Arampatzis A. (2017) A Comparison of Pre-processing Techniques for Twitter Sentiment Analysis. In: Kamps J., Tsakonas G., Manolopoulos Y., Iliadis L., Karydis I. (eds) Research and Advanced Technology for Digital Libraries. TPDL 2017. Lecture Notes in Computer Science, vol 10450. Springer, Cham
 
+## Status
+
+Right now, we have a preprocessing class that hasn't been too rigorously tested, but should mostly work, except for TODOs.
+We need to experiment with it a bit more to the find best settings for our data. Also, the model can be changed (the most obvious optimization might be to *remove* char embeddings).
+
+## TODOs and ideas
+
+* Add pre-trained embeddings (Glove, word2vec, fasttext, ELMO, etc)
+  * https://www.tensorflow.org/hub/modules/google/elmo/1
+* Experiment with architecture (CNNs, remove char embeddings, etc)
+* Experiment with preprocessing and its flags, vocab size, etc
+* Try sub-word embeddings
+* Add TF-IDF weighting 
+* Try http://spacy.io ?
+* Add F1-score, prec/recall, embedding visualization
+* Remove notebooks?
+* Remove <URL> tokens?
+* Look at RCNN, Lukas thinks it did exactly this thing on this dataset (custom LSTM cell)
+* Optimize vocab size: Look at number of unique words (or actually, at the words themselves).
+* ~~Gradient clipping~~
+* Try different cells (current -- GRU)
+* Remove retweets from dataset (RT and existing tweet after it)

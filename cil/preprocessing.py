@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 # from nltk.stem.wordnet import WordNetLemmatizer
 # from nltk.stem.rslp import RSLPStemmer
 
+
 # Replace missing values with the default value, but do not insert them.
 class missingdict(dict):
     def __init__(self, *args, default_val=None, **kwargs):
@@ -319,7 +320,7 @@ class Preprocessing(object):
         four_pattern = re.compile(r'([^0-9])4([^0-9])')
         hashtag_pattern = re.compile(r'#[^ ]+')
 
-        # TODO: debug this
+        # TODO: debug this?
 
         def build_hashtag_map(X, hmap={}):
             for line in X:
@@ -331,7 +332,7 @@ class Preprocessing(object):
                     hashtag = hashtag.group(0)[1:].strip()
                     # print(hashtag)
                     if hashtag not in hmap:
-                        if len(hashtag) > limit:  # TODO: increase this number
+                        if len(hashtag) > limit:  # TODO: increase this number?
                             #           print("Ignoring segmentation of '{}' (too long)".format(hashtag))
                             continue
 
