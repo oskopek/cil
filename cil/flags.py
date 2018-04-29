@@ -24,7 +24,7 @@ def define_flags():
 
     # Optimization parameters
     tf.app.flags.DEFINE_integer('epochs', 15, 'Training epoch count')
-    tf.app.flags.DEFINE_integer('batch_size', 1000, 'Training batch size')
+    tf.app.flags.DEFINE_integer('batch_size', 32, 'Training batch size')
 
     # Jupyter notebook params
     # Only to avoid raising UnrecognizedFlagError
