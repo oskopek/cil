@@ -51,11 +51,11 @@ cnn512:
 	p
 
 fasttext:
-	p
+	./train_fasttext.sh
 
 # End experiments
 
 %:
 	@:
 
-.PHONY: setup train check job status output
+.PHONY: setup train check job status output fasttext
