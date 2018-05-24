@@ -49,24 +49,22 @@ class Model:
         self.current_metrics = [current_accuracy, current_loss]
         self.update_metrics = [update_accuracy, update_loss]
 
-        summary_writer = tf.contrib.summary.create_file_writer(self.save_dir, flush_millis=5_000)
-        self.summaries: Dict[str, List[tf.Operation]] = dict()
-        with summary_writer.as_default(), tf.contrib.summary.record_summaries_every_n_global_steps(
-                10):
-            self.summaries["train"] = [
-                tf.contrib.summary.scalar("train/loss", update_loss),
-                tf.contrib.summary.scalar("train/accuracy", update_accuracy)
-            ]
-        with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
-            for dataset in ["eval", "test"]:
-                self.summaries[dataset] = [
-                    tf.contrib.summary.scalar(dataset + "/loss", current_loss),
-                    tf.contrib.summary.scalar(dataset + "/accuracy", current_accuracy)
-                ]
+        with self.summary_writer.as_default():
+            with tf.contrib.summary.record_summaries_every_n_global_steps(10):
+                self.summaries["train"].extend([
+                    tf.contrib.summary.scalar("train/loss", update_loss),
+                    tf.contrib.summary.scalar("train/accuracy", update_accuracy)
+                ])
+            with tf.contrib.summary.always_record_summaries():
+                for dataset in ["eval", "test"]:
+                    self.summaries[dataset].extend([
+                        tf.contrib.summary.scalar(dataset + "/loss", current_loss),
+                        tf.contrib.summary.scalar(dataset + "/accuracy", current_accuracy)
+                    ])
 
         # Initialize variables
         self.session.run(tf.global_variables_initializer())
-        with summary_writer.as_default():
+        with self.summary_writer.as_default():
             tf.contrib.summary.initialize(session=self.session, graph=self.session.graph)
 
     def __init__(self,
@@ -89,6 +87,10 @@ class Model:
         self.exp_id = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}-{expname}"
         self.save_dir = os.path.join(logdir, self.exp_id)
 
+        self.summaries: Dict[str, List[tf.Operation]] = dict()
+        for key in ["train", "eval", "test"]:
+            self.summaries[key] = []
+
         # Create an empty graph and a session
         graph = tf.Graph()
         graph.seed = seed
@@ -102,6 +104,8 @@ class Model:
         # Construct the graph
         with self.session.graph.as_default():
             self._placeholders()
+            self.summary_writer = tf.contrib.summary.create_file_writer(
+                self.save_dir, flush_millis=5_000)
             self.predictions, self.loss, self.training_step = self.build_model()
             with tf.name_scope("summaries"):
                 self._summaries_and_init()

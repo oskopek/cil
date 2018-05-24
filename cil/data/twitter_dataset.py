@@ -153,6 +153,7 @@ class TwitterDataset:
         batch_word_ids = np.zeros([batch_size, max_sentence_len], np.int32)
         for i in range(batch_size):
             length = min(batch_sentence_lens[i], max_sentence_len)
+            batch_sentence_lens[i] = length
             batch_word_ids[i, :length] = self._word_ids[batch_perm[i]][:length]
 
         if hasattr(self, '_labels'):  # not test

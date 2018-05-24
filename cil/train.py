@@ -39,10 +39,10 @@ if FLAGS.enable_preprocessing:
 PREFIX = "data_in/twitter-datasets/"
 
 data = Datasets(
-    # train_pos_file=PREFIX + "train_pos_full.txt",
-    train_pos_file=PREFIX + "train_pos.txt",
-    # train_neg_file=PREFIX + "train_neg_full.txt",
-    train_neg_file=PREFIX + "train_neg.txt",
+    train_pos_file=PREFIX + "train_pos_full.txt",
+    # train_pos_file=PREFIX + "train_pos.txt",
+    train_neg_file=PREFIX + "train_neg_full.txt",
+    # train_neg_file=PREFIX + "train_neg.txt",
     test_file=PREFIX + "test_data.txt",
     preprocessing=preprocessing,
     eval_size=FLAGS.eval_size,
@@ -118,6 +118,8 @@ elif FLAGS.model == "CNN":
 network = net_class(
     rnn_cell=FLAGS.rnn_cell,
     rnn_cell_dim=FLAGS.rnn_cell_dim,
+    attention=FLAGS.attention,
+    attention_size=FLAGS.attention_size,
     num_words=len(data.train.vocabulary('words')),
     num_chars=len(data.train.vocabulary('chars')),
     logdir=FLAGS.logdir,

@@ -7,7 +7,7 @@ FLAGS = flags.FLAGS
 def define_flags():
     # Directories
     flags.DEFINE_string('logdir', 'data_out', 'Logdir name.')
-    flags.DEFINE_string('exp', '', 'Experiment name.')
+    flags.DEFINE_string('exp', None, 'Experiment name.')
     flags.DEFINE_string('checkpoint_dir', 'checkpoints',
                         'Directory in expdir to save checkpoints in (once per epoch)')
     flags.DEFINE_string('checkpoint_path', None, 'Checkpoint to load. If none, ignored.')
@@ -16,13 +16,13 @@ def define_flags():
     flags.DEFINE_float('eval_size', 0.25, 'Evaluation data split size (percentage).')
 
     # Model choice
-    flags.DEFINE_string('model', 'CNN', 'Model choice.')
+    flags.DEFINE_string('model', 'RNN', 'Model choice.')
 
     # TF parameters
     flags.DEFINE_boolean("no_gpu", False, 'Disables GPU usage even if a GPU is available')
     flags.DEFINE_integer('threads', 8, 'Maximum number of threads to use.')
     flags.DEFINE_integer('seed', 42, 'Random seed')
-    flags.DEFINE_bool('show_batch_metrics', True, 'Show batch metrics in progress bar (slow).')
+    flags.DEFINE_bool('show_batch_metrics', False, 'Show batch metrics in progress bar (slow).')
 
     # Optimization parameters
     flags.DEFINE_integer('epochs', 15, 'Training epoch count')
@@ -37,6 +37,8 @@ def define_flags():
     # RNN params
     flags.DEFINE_string('rnn_cell', "LSTM", 'RNN cell type.')
     flags.DEFINE_integer('rnn_cell_dim', 128, 'RNN cell dimension.')
+    flags.DEFINE_string('attention', 'add', 'Attention type (add ~ Bahdanau, mult ~ Luong, None).')
+    flags.DEFINE_integer('attention_size', 100, 'Attention size.')
 
     # Embedding params
     flags.DEFINE_integer('word_embedding', 200, 'word_embedding')
