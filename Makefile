@@ -5,7 +5,7 @@ clean:
 	yapf -ir cil/
 
 train:
-	python -m cil.train
+	python -m cil.train $(filter-out $@,$(MAKECMDGOALS))
 
 check:
 	flake8 cil/

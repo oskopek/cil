@@ -73,6 +73,7 @@ class Model:
                  num_words: int,
                  num_chars: int,
                  *args,
+                 padding_size: int = 40,
                  threads: int = 1,
                  seed: int = 42,
                  logdir: str = "logs",
@@ -81,6 +82,9 @@ class Model:
         super().__init__()
         self.num_words = num_words
         self.num_chars = num_chars
+        self.padding_size = padding_size
+
+        self.logdir = logdir
         self.expname = expname
         self.exp_id = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}-{expname}"
         self.save_dir = os.path.join(logdir, self.exp_id)
@@ -138,7 +142,14 @@ class Model:
         fetches = [self.training_step, self.summaries["train"]]
         return self.session.run(fetches, self._build_feed_dict(batch, is_training=True))
 
-    def train(self, data: Datasets, epochs: int, batch_size: int = 1) -> None:
+    def train(self,
+              data: Datasets,
+              epochs: int,
+              batch_size: int = 1,
+              show_batch_metrics: bool = False) -> None:
+        """
+        `show_batch_metrics` can be enabled, but takes up time during training.
+        """
         epoch_tqdm = tqdm.tqdm(range(epochs), desc="Epochs")
         best_eval_accuracy = 0.0
         for epoch in epoch_tqdm:
@@ -147,8 +158,8 @@ class Model:
             for _ in batch_tqdm:
                 batch = next(batch_generator)
                 self.train_batch(batch)
-                # Can be enabled, but takes up time during training
-                # batch_tqdm.set_postfix(self._train_metrics())
+                if show_batch_metrics:
+                    batch_tqdm.set_postfix(self._train_metrics())
             eval_metrics = self._eval_metrics(data, batch_size=batch_size)
             epoch_tqdm.set_postfix(eval_metrics)
             eval_accuracy = eval_metrics["eval_acc"]
@@ -158,7 +169,7 @@ class Model:
 
                 # Print test predictions
                 out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_accuracy}.csv"
-                print_outputs(out_file, test_predictions, data.test.vocabulary('sentiments'))
+                print_outputs(out_file, test_predictions, data.test.vocabulary('labels'))
                 print("Exported predictions to", out_file, flush=True)
                 print(flush=True)
 

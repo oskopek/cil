@@ -6,28 +6,20 @@ from .utils import PAD_TOKEN, UNK_TOKEN
 class TwitterDataset:
     """Class capable of loading CIL Twitter dataset."""
 
-    def __init__(self, lines, sentiments, word_vocab=None, train=None):
+    def __init__(self, lines, labels, word_vocab=None, train=None, padding_size=None):
         """Load dataset from the given files.
 
         Arguments:
         train: If given, the vocabularies from the training data will be reused.
         """
+        self.padding_size = padding_size
         self.is_train = train is None  # if train is none, this dataset is the training one
 
         # Create vocabulary_maps
         if train:
             self._vocabulary_maps = train._vocabulary_maps
         else:
-            self._vocabulary_maps = {
-                'chars': {
-                    PAD_TOKEN: 0,
-                    UNK_TOKEN: 1
-                },
-                'sentiments': {
-                    0: 0,
-                    1: 1
-                }
-            }
+            self._vocabulary_maps = {'chars': {PAD_TOKEN: 0, UNK_TOKEN: 1}, 'labels': {0: 0, 1: 1}}
             if word_vocab:
                 self._vocabulary_maps['words'] = word_vocab
             else:
@@ -37,15 +29,15 @@ class TwitterDataset:
         self._charseq_ids = []
         self._charseqs_map = {PAD_TOKEN: 0}
         self._charseqs = []
-        if sentiments:
-            self._sentiments = []
+        if labels:
+            self._labels = []
 
         # Load the sentences
         for idx, line in enumerate(lines):
-            if sentiments:  # if not test
-                sentiment = sentiments[idx]
-                assert sentiment in self._vocabulary_maps['sentiments']
-                self._sentiments.append(self._vocabulary_maps['sentiments'][sentiment])
+            if labels:  # if not test
+                sentiment = labels[idx]
+                assert sentiment in self._vocabulary_maps['labels']
+                self._labels.append(self._vocabulary_maps['labels'][sentiment])
 
             self._word_ids.append([])
             self._charseq_ids.append([])
@@ -100,7 +92,7 @@ class TwitterDataset:
         The features are the following:
         words
         chars
-        sentiments
+        labels
         """
         return self._vocabularies[feature]
 
@@ -108,7 +100,7 @@ class TwitterDataset:
         """Return the next batch.
 
         Arguments:
-        Returns: (sentence_lens, word_ids, charseq_ids, charseqs, charseq_lens, sentiments)
+        Returns: (sentence_lens, word_ids, charseq_ids, charseqs, charseq_lens, labels)
         sequence_lens: batch of sentence_lens
         word_ids: batch of word_ids
         charseq_ids: batch of charseq_ids (the same shape as word_ids, but with the ids pointing
@@ -116,7 +108,7 @@ class TwitterDataset:
         charseqs: unique charseqs in the batch, indexable by charseq_ids;
           contain indices of characters from vocabulary('chars')
         charseq_lens: length of charseqs
-        sentiments: batch of sentiments
+        labels: batch of labels
 
         batch: [string]
 
@@ -152,25 +144,31 @@ class TwitterDataset:
 
         # General data
         batch_sentence_lens = self._sentence_lens[batch_perm]
-        max_sentence_len = np.max(batch_sentence_lens)
+        if self.padding_size is None:
+            max_sentence_len = np.max(batch_sentence_lens)
+        else:
+            max_sentence_len = self.padding_size
 
         # Word-level data
         batch_word_ids = np.zeros([batch_size, max_sentence_len], np.int32)
         for i in range(batch_size):
-            batch_word_ids[i, 0:batch_sentence_lens[i]] = self._word_ids[batch_perm[i]]
+            length = min(batch_sentence_lens[i], max_sentence_len)
+            batch_word_ids[i, :length] = self._word_ids[batch_perm[i]][:length]
 
-        if hasattr(self, '_sentiments'):  # not test
-            batch_sentiments = np.zeros([batch_size], np.int32)
+        if hasattr(self, '_labels'):  # not test
+            batch_labels = np.zeros([batch_size], np.int32)
             for i in range(batch_size):
-                batch_sentiments[i] = self._sentiments[batch_perm[i]]
+                batch_labels[i] = self._labels[batch_perm[i]]
         else:
-            batch_sentiments = None
+            batch_labels = None
 
         # Character-level data
         batch_charseq_ids = np.zeros([batch_size, max_sentence_len], np.int32)
         charseqs_map, charseqs = {}, []
         for i in range(batch_size):
             for j, charseq_id in enumerate(self._charseq_ids[batch_perm[i]]):
+                if j >= max_sentence_len:
+                    break
                 if charseq_id not in charseqs_map:
                     charseqs_map[charseq_id] = len(charseqs)
                     charseqs.append(self._charseqs[charseq_id])
@@ -182,7 +180,7 @@ class TwitterDataset:
             batch_charseqs[i, 0:len(charseqs[i])] = charseqs[i]
 
         return batch_sentence_lens, batch_word_ids, batch_charseq_ids, batch_charseqs, \
-            batch_charseq_lens, batch_sentiments, self.is_train
+            batch_charseq_lens, batch_labels, self.is_train
 
     def batch_per_epoch_generator(self, batch_size, shuffle=True):
         assert self.is_train == shuffle

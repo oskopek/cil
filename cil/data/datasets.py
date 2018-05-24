@@ -28,7 +28,8 @@ class Datasets:
                  preprocessing,
                  eval_size=0.33,
                  random_state=42,
-                 vocab_size=20000):
+                 vocab_size=20000,
+                 padding_size=40):
         self.train_pos_file = train_pos_file
         self.train_neg_file = train_neg_file
         self.test_file = test_file
@@ -36,6 +37,7 @@ class Datasets:
         self.random_state = random_state
         self.preprocessing = preprocessing
         self.vocab_size = vocab_size
+        self.padding_size = padding_size
 
     @staticmethod
     def _read_lines(file):
@@ -88,9 +90,10 @@ class Datasets:
         self.inv_word_vocab = inv_word_vocab
 
         print("Generating TF data...")
-        self.train = TwitterDataset(X_train, y_train, word_vocab=self.word_vocab)
-        self.eval = TwitterDataset(X_eval, y_eval, train=self.train)
-        self.test = TwitterDataset(X_test, None, train=self.train)
+        self.train = TwitterDataset(
+            X_train, y_train, word_vocab=self.word_vocab, padding_size=self.padding_size)
+        self.eval = TwitterDataset(X_eval, y_eval, train=self.train, padding_size=self.padding_size)
+        self.test = TwitterDataset(X_test, None, train=self.train, padding_size=self.padding_size)
 
     def batches_per_epoch_generator(self, batch_size, data=None, shuffle=True):
         if data is None:

@@ -10,20 +10,20 @@ from .utils import UNK_TOKEN, PAD_TOKEN, MissingDict, BASE_VOCAB
 class Preprocessing:
     methods = None
 
-    def __init__(self,
-                 standardize=False,
-                 segment_hashtags=None,
-                 contractions=False,
-                 rem_numbers=False,
-                 punct_squash=False,
-                 fix_slang=False,
-                 word_squash=None,
-                 expl_negations=False,
-                 rem_stopwords=False,
-                 stemming=None,
-                 lemmatization=None,
-                 padding_size=40):
-        self.padding_size = padding_size
+    def __init__(
+            self,
+            standardize=False,
+            segment_hashtags=0,
+            contractions=False,
+            rem_numbers=False,
+            punct_squash=False,
+            fix_slang=False,
+            word_squash=0,
+            expl_negations=False,
+            rem_stopwords=False,
+            stemming=None,
+            lemmatization=None,
+    ):
         self.methods = [
             # line operations
             (self.standardize, standardize),
@@ -304,18 +304,18 @@ class Preprocessing:
 
         return gen_lemma(lines), labels
 
-    def _vocab_downsize_dict(self, lines, vocab, inv_vocab):
+    def _vocab_downsize_dict(self, lines, vocab, inv_vocab, padding_size):
         lines = np.asarray(lines)
-        data = np.full((len(lines), self.padding_size), PAD_TOKEN, dtype=object)
+        data = np.full((len(lines), padding_size), PAD_TOKEN, dtype=object)
         cut_counter = 0
         for i, line in enumerate(lines):
             strs = np.asarray(line).astype(object)
-            fin_len = min(self.padding_size, len(strs))
+            fin_len = min(padding_size, len(strs))
             data[i, :fin_len] = strs[:fin_len]
-            if len(strs) > self.padding_size:
+            if len(strs) > padding_size:
                 cut_counter += 1
         if cut_counter > 0:
-            print(f"WARNING: Cut {cut_counter} sentences to length {self.padding_size}.")
+            print(f"WARNING: Cut {cut_counter} sentences to length {padding_size}.")
 
         data = np.vectorize(lambda word: inv_vocab[vocab[word]])(data)
         return data
@@ -331,10 +331,10 @@ class Preprocessing:
             vocab[word] = len(vocab)
         return MissingDict(vocab, default_val=vocab[UNK_TOKEN])
 
-    def vocab(self, lines, vocab_downsize):
+    def vocab(self, lines, vocab_downsize, padding_size=None):
         if isinstance(vocab_downsize, int):
             vocab = self._vocab_downsize_tosize(lines, vocab_downsize)
             inv_vocab = {v: k for k, v in vocab.items()}
             return vocab, inv_vocab
         else:
-            return self._vocab_downsize_dict(lines, *vocab_downsize)
+            return self._vocab_downsize_dict(lines, *vocab_downsize, padding_size=padding_size)
