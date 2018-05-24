@@ -115,11 +115,11 @@ class Model:
         raise NotImplementedError("To be overridden.")
 
     @staticmethod
-    def _tqdm_metrics(dataset: str, metrics: List[Any], names: List[str]) -> Dict[str, str]:
+    def _tqdm_metrics(dataset: str, metrics: List[float], names: List[str]) -> Dict[str, str]:
         d: Dict[str, str] = OrderedDict()
         assert len(metrics) == len(names)
         for metric, name in zip(metrics, names):
-            d[f'{dataset}_{name}'] = str(metric)
+            d[f'{dataset}_{name}'] = f"{metric:.4f}"
         return d
 
     def _train_metrics(self) -> Dict[str, str]:
