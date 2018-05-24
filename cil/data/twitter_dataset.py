@@ -85,6 +85,9 @@ class TwitterDataset:
 
         self._new_permutation()
 
+    def __len__(self):
+        return len(self._word_ids)
+
     def _new_permutation(self):
         if self.is_train:
             self._permutation = np.random.permutation(len(self._sentence_lens))
@@ -179,9 +182,18 @@ class TwitterDataset:
             batch_charseqs[i, 0:len(charseqs[i])] = charseqs[i]
 
         return batch_sentence_lens, batch_word_ids, batch_charseq_ids, batch_charseqs, \
-            batch_charseq_lens, batch_sentiments
+            batch_charseq_lens, batch_sentiments, self.is_train
 
     def batch_per_epoch_generator(self, batch_size, shuffle=True):
         assert self.is_train == shuffle
         while not self.epoch_finished():
             yield self.next_batch(batch_size)
+
+    def batches_per_epoch(self, batch_size: int = 1, shuffle: bool = True):
+        n_batches = self.n_batches(batch_size=batch_size)
+        batch_generator = self.batch_per_epoch_generator(batch_size=batch_size, shuffle=shuffle)
+        return n_batches, batch_generator
+
+    def n_batches(self, batch_size: int = 1):
+        remainder = 0 if len(self) % batch_size == 0 else 1
+        return len(self) // batch_size + remainder

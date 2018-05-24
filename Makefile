@@ -11,7 +11,7 @@ check:
 	flake8 cil/
 
 job:
-	source ~/git/cil/venv/bin/activate && bsub -W 04:00 -n 4 -R "rusage[mem=2048,ngpus_excl_p=1]" python -m cil.train $(filter-out $@,$(MAKECMDGOALS))
+	bsub -W 04:00 -n 4 -R "rusage[mem=2048, ngpus_excl_p=1]" ./train.sh $(filter-out $@,$(MAKECMDGOALS))
 
 status:
 	watch -n 1 bbjobs

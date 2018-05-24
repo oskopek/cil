@@ -1,5 +1,6 @@
 from collections import Counter
 
+import nltk
 import numpy as np
 
 from . import flags
@@ -7,26 +8,38 @@ from .models.rnn import RNN
 from .data.preprocessing import Preprocessing
 from .data.datasets import Datasets
 
-# Fix random seed
-SEED = 42
-np.random.seed(SEED)
-
 # Parse arguments
 flags.define_flags()
 FLAGS = flags.FLAGS
 
+# Fix random seed
+np.random.seed(FLAGS.seed)
+
 # Load the data
 PREFIX = "data_in/twitter-datasets/"
-EVAL_SIZE = 0.25
+stemming = getattr(nltk.stem, FLAGS.stemmer)() if FLAGS.stemmer else None
+lemmatization = getattr(nltk.stem, FLAGS.lemmatizer)() if FLAGS.lemmatizer else None
 data = Datasets(
-    train_pos_file=PREFIX + "train_pos_full.txt",
-    # train_pos_file=PREFIX + "train_pos.txt",
-    train_neg_file=PREFIX + "train_neg_full.txt",
-    # train_neg_file=PREFIX + "train_neg.txt",
+    # train_pos_file=PREFIX + "train_pos_full.txt",
+    train_pos_file=PREFIX + "train_pos.txt",
+    # train_neg_file=PREFIX + "train_neg_full.txt",
+    train_neg_file=PREFIX + "train_neg.txt",
     test_file=PREFIX + "test_data.txt",
-    preprocessing=Preprocessing(),
-    eval_size=EVAL_SIZE,
-    vocab_size=20000)
+    preprocessing=Preprocessing(
+        standardize=FLAGS.standardize,
+        segment_hashtags=FLAGS.segment_hashtags,
+        contractions=FLAGS.contractions,
+        rem_numbers=FLAGS.rem_numbers,
+        punct_squash=FLAGS.punct_squash,
+        fix_slang=FLAGS.fix_slang,
+        word_squash=FLAGS.word_squash,
+        expl_negations=FLAGS.expl_negations,
+        rem_stopwords=FLAGS.rem_stopwords,
+        stemming=stemming,
+        lemmatization=lemmatization,
+        padding_size=FLAGS.padding_size),
+    eval_size=FLAGS.eval_size,
+    vocab_size=FLAGS.vocab_size)
 data.load()
 
 idx = 100
@@ -73,25 +86,21 @@ print_data(data.test, "test")
 
 # Construct the network
 print("Constructing the network.", flush=True)
-expname = f"{FLAGS.rnn_cell}{FLAGS.rnn_cell_dim}-bs{FLAGS.batch_size}-epochs{FLAGS.epochs}"
-expname += f"-char{FLAGS.char_embedding}-word{FLAGS.word_embedding}"
+
 network = RNN(
     rnn_cell=FLAGS.rnn_cell,
     rnn_cell_dim=FLAGS.rnn_cell_dim,
     num_words=len(data.train.vocabulary('words')),
     num_chars=len(data.train.vocabulary('chars')),
     logdir=FLAGS.logdir,
-    expname=expname,
+    expname=f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}',
     threads=FLAGS.threads,
     word_embedding=FLAGS.word_embedding,
     char_embedding=FLAGS.char_embedding,
     keep_prob=FLAGS.keep_prob,
     learning_rate=FLAGS.learning_rate,
-    seed=SEED)
+    seed=FLAGS.seed)
 
 # Train
-best_eval_accuracy = 0
-test_predictions = None
-
 network.train(data, epochs=FLAGS.epochs, batch_size=FLAGS.batch_size)
 print("End.")

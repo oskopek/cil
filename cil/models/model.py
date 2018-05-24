@@ -157,7 +157,7 @@ class Model:
                 test_predictions = self.predict_epoch(data.test, "test")
 
                 # Print test predictions
-                out_file = f"data_out/predictions_{self.exp_id}_epoch_{epoch}_{eval_accuracy}.csv"
+                out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_accuracy}.csv"
                 print_outputs(out_file, test_predictions, data.test.vocabulary('sentiments'))
                 print("Exported predictions to", out_file, flush=True)
                 print(flush=True)

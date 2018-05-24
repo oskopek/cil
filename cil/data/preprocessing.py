@@ -10,22 +10,19 @@ from .utils import UNK_TOKEN, PAD_TOKEN, MissingDict, BASE_VOCAB
 class Preprocessing:
     methods = None
 
-    def __init__(
-            self,
-            standardize=True,
-            segment_hashtags=10,
-            contractions=True,
-            rem_numbers=True,
-            punct_squash=True,
-            fix_slang=True,
-            word_squash=3,
-            expl_negations=False,
-            rem_stopwords=False,
-            stemming=nltk.stem.PorterStemmer(),
-            #  stemming=None,
-            #  lemmatization=nltk.stem.WordNetLemmatizer(),
-            lemmatization=None,
-            padding_size=40):
+    def __init__(self,
+                 standardize=False,
+                 segment_hashtags=None,
+                 contractions=False,
+                 rem_numbers=False,
+                 punct_squash=False,
+                 fix_slang=False,
+                 word_squash=None,
+                 expl_negations=False,
+                 rem_stopwords=False,
+                 stemming=None,
+                 lemmatization=None,
+                 padding_size=40):
         self.padding_size = padding_size
         self.methods = [
             # line operations
@@ -47,7 +44,6 @@ class Preprocessing:
 
     def transform(self, lines, labels=None):  # labels == None => test transformation
         for fn, args in self.methods:
-            # assert len(lines) == len(labels)
             if args:
                 lines, labels = fn(lines, labels, args)
         return lines, labels

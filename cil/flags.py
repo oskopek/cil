@@ -7,19 +7,13 @@ FLAGS = flags.FLAGS
 def define_flags():
     # Directories
     flags.DEFINE_string('logdir', 'data_out', 'Logdir name.')
-    flags.DEFINE_string('exp', 'experiment', 'Experiment name.')
+    flags.DEFINE_string('exp', '', 'Experiment name.')
     flags.DEFINE_string('checkpoint_dir', 'checkpoints',
                         'Directory in expdir to save checkpoints in (once per epoch)')
-
     flags.DEFINE_string('checkpoint_path', None, 'Checkpoint to load. If none, ignored.')
 
-    # Data files
-    flags.DEFINE_string('train_file', 'data/stories.train.csv', 'Train data file.')
-    flags.DEFINE_string('eval_file', 'data/stories.eval.csv', 'Evaluation data file.')
-    flags.DEFINE_string('test_file', None, 'Test data file.')
-
-    # Model choice
-    flags.DEFINE_string('model', 'RNN', 'Model class name.')
+    # Data settings
+    flags.DEFINE_integer('eval_size', 0.25, 'Evaluation data split size (percentage).')
 
     # TF parameters
     flags.DEFINE_boolean("no_gpu", False, 'Disables GPU usage even if a GPU is available')
@@ -42,3 +36,18 @@ def define_flags():
     flags.DEFINE_integer('word_embedding', 200, 'word_embedding')
     flags.DEFINE_integer('char_embedding', 200, 'char_embedding')
     flags.DEFINE_float('keep_prob', 0.5, 'dropout probability')
+
+    # Preprocessing
+    flags.DEFINE_bool('standardize', True, 'Standardize text spacing.')
+    flags.DEFINE_integer('segment_hashtags', 0, 'Attempt to segment hashtags of length <= value.')
+    flags.DEFINE_bool('contractions', True, 'Expand contractions.')
+    flags.DEFINE_bool('rem_numbers', True, 'Remove numbers.')
+    flags.DEFINE_bool('punct_squash', True, 'Squash repeated punctuation marks.')
+    flags.DEFINE_bool('fix_slang', True, 'Fix common slang terms.')
+    flags.DEFINE_integer('word_squash', 3, 'Squash N+ occurences of the same word consecutively.')
+    flags.DEFINE_bool('expl_negations', False, 'NOT IMPLEMENTED. Explicit negations "NOT_word".')
+    flags.DEFINE_bool('rem_stopwords', True, 'Remove stopwords.')
+    flags.DEFINE_string('stemmer', 'PorterStemmer', 'Stemmer from nltk.')
+    flags.DEFINE_string('lemmatizer', 'WordNetLemmatizer', 'Lemmatizer from nltk.')
+    flags.DEFINE_integer('padding_size', 40, 'Padding size.')
+    flags.DEFINE_integer('vocab_size', 20_000, 'Vocabulary size.')

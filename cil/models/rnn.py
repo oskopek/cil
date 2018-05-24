@@ -23,6 +23,7 @@ class RNN(Model):
                  keep_prob: float = 0.5,
                  learning_rate: float = 1e-4,
                  grad_clip: float = 10.0,
+                 expname: str = "exp",
                  **kwargs) -> None:
         self.rnn_cell = rnn_cell
         self.rnn_cell_dim = rnn_cell_dim
@@ -32,9 +33,10 @@ class RNN(Model):
         self.learning_rate = learning_rate
         self.grad_clip = grad_clip
 
-        # Call super last, because our build_model method probably needs above initialization to
-        # happen first
-        super().__init__(*args, **kwargs)
+        # Call super last, because our build_model method probably
+        # needs above initialization to happen first
+        expname = f"{rnn_cell}{rnn_cell_dim}-char{char_embedding}-word{word_embedding}-{expname}"
+        super().__init__(*args, expname=expname, **kwargs)
 
     def _create_cell(self) -> tf.nn.rnn_cell.RNNCell:
         if self.rnn_cell == "LSTM":
