@@ -143,7 +143,7 @@ class RNN(Model):
 
     def _attention_summaries(self, alignments, prefix=""):
         with self.summary_writer.as_default():
-            with tf.contrib.summary.record_summaries_every_n_global_steps(10):
+            with tf.contrib.summary.record_summaries_every_n_global_steps(self.EVERY_STEPS):
                 img = RNN._attention_images_summary(
                     alignments, self.batch_size, prefix=f"{prefix}/train")
                 self.summaries["train"].append(img)

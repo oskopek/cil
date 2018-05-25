@@ -13,6 +13,8 @@ import tqdm
 
 
 class Model:
+    EVERY_STEPS = 200
+
     def _placeholders(self) -> None:
         self.global_step = tf.Variable(0, dtype=tf.int64, trainable=False, name="global_step")
 
@@ -50,7 +52,7 @@ class Model:
         self.update_metrics = [update_accuracy, update_loss]
 
         with self.summary_writer.as_default():
-            with tf.contrib.summary.record_summaries_every_n_global_steps(10):
+            with tf.contrib.summary.record_summaries_every_n_global_steps(self.EVERY_STEPS):
                 self.summaries["train"].extend([
                     tf.contrib.summary.scalar("train/loss", update_loss),
                     tf.contrib.summary.scalar("train/accuracy", update_accuracy)
@@ -105,7 +107,7 @@ class Model:
         with self.session.graph.as_default():
             self._placeholders()
             self.summary_writer = tf.contrib.summary.create_file_writer(
-                self.save_dir, flush_millis=5_000)
+                self.save_dir, flush_millis=10_000)
             self.predictions, self.loss, self.training_step = self.build_model()
             with tf.name_scope("summaries"):
                 self._summaries_and_init()
