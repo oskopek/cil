@@ -14,7 +14,7 @@ def define_flags():
 
     # Data settings
     flags.DEFINE_float('eval_size', 0.25, 'Evaluation data split size (percentage).')
-    flags.DEFINE_bool('full_data', True, 'Use full or small data.')
+    flags.DEFINE_bool('full_data', False, 'Use full or small data.')
 
     # Model choice
     flags.DEFINE_string('model', 'RNN', 'Model choice.')

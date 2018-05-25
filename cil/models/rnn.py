@@ -147,11 +147,6 @@ class RNN(Model):
                 img = RNN._attention_images_summary(
                     alignments, self.batch_size, prefix=f"{prefix}/train")
                 self.summaries["train"].append(img)
-            with tf.contrib.summary.always_record_summaries():
-                for key in ["eval", "test"]:
-                    img = RNN._attention_images_summary(
-                        alignments, self.batch_size, prefix=f"{prefix}/{key}")
-                    self.summaries[key].append(img)
 
     def _add_attention(self, outputs, sentence_lens, cell_output, prefix=""):
         attention_mechanism = self._create_attention(outputs, sentence_lens)
@@ -173,21 +168,25 @@ class RNN(Model):
             dtype=tf.float32,
             scope="rnn_words")
 
-        with tf.variable_scope("attention_fw"):
-            c_state_fw, m_state_fw = state_fw
-            context_fw = self._add_attention(
-                outputs_fw, self.sentence_lens, cell_output=m_state_fw, prefix="attention_fw")
-            print("context_fw", context_fw.get_shape())
-        with tf.variable_scope("attention_bw"):
-            c_state_bw, m_state_bw = state_bw
-            context_bw = self._add_attention(
-                outputs_bw, self.sentence_lens, cell_output=m_state_bw, prefix="attention_bw")
-            print("context_bw", context_bw.get_shape())
+        sentence_states =[]
+        if self.attention is not None:
+            with tf.variable_scope("attention_fw"):
+                c_state_fw, m_state_fw = state_fw
+                context_fw = self._add_attention(
+                    outputs_fw, self.sentence_lens, cell_output=m_state_fw, prefix="attention_fw")
+                print("context_fw", context_fw.get_shape())
+            with tf.variable_scope("attention_bw"):
+                c_state_bw, m_state_bw = state_bw
+                context_bw = self._add_attention(
+                    outputs_bw, self.sentence_lens, cell_output=m_state_bw, prefix="attention_bw")
+                print("context_bw", context_bw.get_shape())
+            sentence_states.extend([context_fw, context_bw])
 
         if self.rnn_cell == "LSTM":
             state_fw = tf.concat(state_fw, axis=-1)
             state_bw = tf.concat(state_bw, axis=-1)
-        sentence_states = tf.concat([context_fw, context_bw, state_fw, state_bw], axis=1)
+        sentence_states.extend([state_fw, state_bw])
+        sentence_states = tf.concat(sentence_states, axis=1)
         print("sentence_states", sentence_states.get_shape())
         return sentence_states
 
@@ -218,7 +217,9 @@ class RNN(Model):
             with tf.name_scope("fc"):
                 output_layer = self._fc(sentence_states)
 
-            predictions = tf.cast(tf.argmax(output_layer, 1), tf.int32, name="predictions")
+            with tf.name_scope("predictions"):
+                predictions = tf.argmax(output_layer, axis=1)
+                predictions = tf.cast(predictions, dtype=tf.int32)
 
             with tf.name_scope("loss"):
                 loss = tf.losses.sparse_softmax_cross_entropy(

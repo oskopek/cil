@@ -139,9 +139,13 @@ class Model:
 
     def _build_feed_dict(self,
                          batch: Tuple[Union[np.ndarray, bool], ...],
-                         is_training: bool = False) -> Dict[tf.Tensor, Union[np.ndarray, bool]]:
+                         is_training: bool = False,
+                         predict: bool = False) -> Dict[tf.Tensor, Union[np.ndarray, bool]]:
         assert is_training == batch[-1]
-        return {tensor: value for tensor, value in zip(self.placeholder_tensors, batch)}
+        d = {tensor: value for tensor, value in zip(self.placeholder_tensors, batch)}
+        if predict:
+            del d[self.labels]
+        return d
 
     def train_batch(self, batch: Tuple[Union[np.ndarray, bool], ...]) -> List[Any]:
         self.session.run(self.reset_metrics)
@@ -151,7 +155,7 @@ class Model:
     def train(self,
               data: Datasets,
               epochs: int,
-              batch_size: int = 1,
+              batch_size: int,
               show_batch_metrics: bool = False) -> None:
         """
         `show_batch_metrics` can be enabled, but takes up time during training.
@@ -168,10 +172,10 @@ class Model:
                     batch_tqdm.set_postfix(self._train_metrics())
             eval_metrics = self._eval_metrics(data, batch_size=batch_size)
             epoch_tqdm.set_postfix(eval_metrics)
-            eval_accuracy = eval_metrics["eval_acc"]
+            eval_accuracy = float(eval_metrics["eval_acc"])
             if eval_accuracy > best_eval_accuracy:
                 best_eval_accuracy = eval_accuracy
-                test_predictions = self.predict_epoch(data.test, "test")
+                test_predictions = self.predict_epoch(data.test, "test", batch_size=batch_size)
 
                 # Print test predictions
                 out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_accuracy}.csv"
@@ -180,19 +184,18 @@ class Model:
                 print(flush=True)
 
     def evaluate_epoch(self, data: TwitterDataset, dataset: str,
-                       batch_size: int = 1) -> List[float]:
+                       batch_size: int) -> List[float]:
         self.session.run(self.reset_metrics)
         for batch in data.batch_per_epoch_generator(batch_size, shuffle=False):
             self.session.run(self.update_metrics, self._build_feed_dict(batch))
         returns = self.session.run(self.current_metrics + [self.summaries[dataset]])
         return returns[:len(self.current_metrics)]  # return current metrics
 
-    def predict_epoch(self, data: TwitterDataset, dataset: str, batch_size: int = 1) -> List[int]:
-        self.session.run(self.reset_metrics)
+    def predict_epoch(self, data: TwitterDataset, dataset: str, batch_size: int) -> List[int]:
         predictions: List[int] = []
-        self.session.run(self.reset_metrics)
         for batch in data.batch_per_epoch_generator(batch_size, shuffle=False):
-            batch_predictions = self.session.run(self.predictions, self._build_feed_dict(batch))
+            batch_predictions = self.session.run(self.predictions, self._build_feed_dict(batch,
+                predict=True))
             predictions.extend(batch_predictions)
         self.session.run(self.summaries[dataset])
         return predictions
