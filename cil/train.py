@@ -36,14 +36,12 @@ if FLAGS.enable_preprocessing:
     )
 
 # Load the data
-PREFIX = "data_in/twitter-datasets/"
-
+PREFIX = "data_in/twitter-datasets"
+full_data = '_full' if FLAGS.full_data else ''
 data = Datasets(
-    train_pos_file=PREFIX + "train_pos_full.txt",
-    # train_pos_file=PREFIX + "train_pos.txt",
-    train_neg_file=PREFIX + "train_neg_full.txt",
-    # train_neg_file=PREFIX + "train_neg.txt",
-    test_file=PREFIX + "test_data.txt",
+    train_pos_file=f"{PREFIX}/train_pos{full_data}.txt",
+    train_neg_file=f"{PREFIX}/train_neg{full_data}.txt",
+    test_file=f"{PREFIX}/test_data.txt",
     preprocessing=preprocessing,
     eval_size=FLAGS.eval_size,
     vocab_size=FLAGS.vocab_size,
