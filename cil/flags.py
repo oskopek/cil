@@ -60,7 +60,6 @@ def define_flags():
     flags.DEFINE_bool('punct_squash', True, 'Squash repeated punctuation marks.')
     flags.DEFINE_bool('fix_slang', True, 'Fix common slang terms.')
     flags.DEFINE_integer('word_squash', 3, 'Squash N+ occurences of the same word consecutively.')
-    flags.DEFINE_bool('expl_negations', False, 'NOT IMPLEMENTED. Explicit negations "NOT_word".')
     flags.DEFINE_bool('rem_stopwords', True, 'Remove stopwords.')
     flags.DEFINE_string('stemmer', 'PorterStemmer', 'Stemmer from nltk.')
     flags.DEFINE_string('lemmatizer', 'WordNetLemmatizer', 'Lemmatizer from nltk.')

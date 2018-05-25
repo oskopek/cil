@@ -139,7 +139,7 @@ class TwitterDataset:
         """
         return self._next_batch(np.arange(len(self._sentence_lens)))
 
-    def _next_batch(self, batch_perm):
+    def _next_batch(self, batch_perm):  # TODO(oskopek): Make this faster for fixed padding.
         batch_size = len(batch_perm)
 
         # General data

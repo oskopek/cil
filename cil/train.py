@@ -29,7 +29,6 @@ if FLAGS.enable_preprocessing:
         punct_squash=FLAGS.punct_squash,
         fix_slang=FLAGS.fix_slang,
         word_squash=FLAGS.word_squash,
-        expl_negations=FLAGS.expl_negations,
         rem_stopwords=FLAGS.rem_stopwords,
         stemming=stemming,
         lemmatization=lemmatization,

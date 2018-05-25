@@ -19,7 +19,6 @@ class Preprocessing:
             punct_squash=False,
             fix_slang=False,
             word_squash=0,
-            expl_negations=False,
             rem_stopwords=False,
             stemming=None,
             lemmatization=None,
@@ -36,7 +35,6 @@ class Preprocessing:
             (self.lines_to_matrix, True),
 
             # matrix operations
-            (self.expl_negations, expl_negations),
             (self.rem_stopwords, rem_stopwords),
             (self.stemming, stemming),
             (self.lemmatization, lemmatization)
@@ -84,7 +82,7 @@ class Preprocessing:
 
         return _standardize(lines), labels
 
-    def segment_hashtags(self, lines, labels, limit):  # TODO(oskopek): Remove me.
+    def segment_hashtags(self, lines, labels, limit):  # TODO: Remove me?
         # https://stackoverflow.com/questions/38125281/split-sentence-without-space-in-python-nltk
 
         WORDS = nltk.corpus.sentence_polarity.words() + ["tweet"] * 2000 + ["tweets"] * 2000
@@ -261,10 +259,6 @@ class Preprocessing:
                 yield re.sub(three_chars, r"\1", line)
 
         return squash_gen(lines), labels
-
-    def expl_negations(self, lines, labels, args):
-        # TODO: add NOT_ prefix to every word up to a punctuation mark
-        return lines, labels
 
     def rem_stopwords(self, lines, labels, args):
         stop_words = set(nltk.corpus.stopwords.words('english'))
