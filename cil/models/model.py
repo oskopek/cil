@@ -152,10 +152,7 @@ class Model:
         fetches = [self.training_step, self.summaries["train"]]
         return self.session.run(fetches, self._build_feed_dict(batch, is_training=True))
 
-    def train(self,
-              data: Datasets,
-              epochs: int,
-              batch_size: int,
+    def train(self, data: Datasets, epochs: int, batch_size: int,
               show_batch_metrics: bool = False) -> None:
         """
         `show_batch_metrics` can be enabled, but takes up time during training.
@@ -183,8 +180,7 @@ class Model:
                 print("Exported predictions to", out_file, flush=True)
                 print(flush=True)
 
-    def evaluate_epoch(self, data: TwitterDataset, dataset: str,
-                       batch_size: int) -> List[float]:
+    def evaluate_epoch(self, data: TwitterDataset, dataset: str, batch_size: int) -> List[float]:
         self.session.run(self.reset_metrics)
         for batch in data.batch_per_epoch_generator(batch_size, shuffle=False):
             self.session.run(self.update_metrics, self._build_feed_dict(batch))
@@ -194,8 +190,8 @@ class Model:
     def predict_epoch(self, data: TwitterDataset, dataset: str, batch_size: int) -> List[int]:
         predictions: List[int] = []
         for batch in data.batch_per_epoch_generator(batch_size, shuffle=False):
-            batch_predictions = self.session.run(self.predictions, self._build_feed_dict(batch,
-                predict=True))
+            batch_predictions = self.session.run(self.predictions,
+                                                 self._build_feed_dict(batch, predict=True))
             predictions.extend(batch_predictions)
         self.session.run(self.summaries[dataset])
         return predictions

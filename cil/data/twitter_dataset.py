@@ -35,9 +35,9 @@ class TwitterDataset:
         # Load the sentences
         for idx, line in enumerate(lines):
             if labels:  # if not test
-                sentiment = labels[idx]
-                assert sentiment in self._vocabulary_maps['labels']
-                self._labels.append(self._vocabulary_maps['labels'][sentiment])
+                label = labels[idx]
+                assert label in self._vocabulary_maps['labels']
+                self._labels.append(self._vocabulary_maps['labels'][label])
 
             self._word_ids.append([])
             self._charseq_ids.append([])

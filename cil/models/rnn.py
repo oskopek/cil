@@ -168,7 +168,7 @@ class RNN(Model):
             dtype=tf.float32,
             scope="rnn_words")
 
-        sentence_states =[]
+        sentence_states = []
         if self.attention is not None:
             with tf.variable_scope("attention_fw"):
                 c_state_fw, m_state_fw = state_fw

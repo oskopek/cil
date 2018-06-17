@@ -14,9 +14,9 @@ class MissingDict(dict):
         return self.default_val
 
 
-def print_outputs(out_file, test_predictions, sentiment_vocab):
+def print_outputs(out_file, test_predictions, label_vocab):
     with open(out_file, "w+") as f:
         print("Id,Prediction", file=f)
         for i, prediction in enumerate(test_predictions):
-            label = int(sentiment_vocab[prediction]) * 2 - 1
+            label = int(label_vocab[prediction]) * 2 - 1
             print(f"{i+1},{label}", file=f)
