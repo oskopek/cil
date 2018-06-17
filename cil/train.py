@@ -112,6 +112,9 @@ if FLAGS.model == "RNN":
 elif FLAGS.model == "CNN":
     net_class = CNN
 
+expname = f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}'
+expname = f'{expname}{full_data}'
+
 network = net_class(
     rnn_cell=FLAGS.rnn_cell,
     rnn_cell_dim=FLAGS.rnn_cell_dim,
@@ -120,7 +123,7 @@ network = net_class(
     num_words=len(data.train.vocabulary('words')),
     num_chars=len(data.train.vocabulary('chars')),
     logdir=FLAGS.logdir,
-    expname=f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}',
+    expname=expname,
     threads=FLAGS.threads,
     word_embedding=FLAGS.word_embedding,
     char_embedding=FLAGS.char_embedding,

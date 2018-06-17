@@ -194,8 +194,8 @@ class RNN(Model):
         x = tf.layers.dropout(x, rate=self.keep_prob, training=self.is_training)
         x = tf.layers.dense(x, 256, activation=tf.nn.leaky_relu)
         x = tf.layers.dropout(x, rate=self.keep_prob, training=self.is_training)
-        # x = tf.layers.dense(x, 256, activation=tf.nn.leaky_relu)
-        # x = tf.layers.dropout(x, rate=self.keep_prob, training=self.is_training)
+        x = tf.layers.dense(x, 256, activation=tf.nn.leaky_relu)
+        x = tf.layers.dropout(x, rate=self.keep_prob, training=self.is_training)
         output_layer = tf.layers.dense(x, self.CLASSES, activation=None)
         print("output_layer", output_layer.get_shape())
         return output_layer

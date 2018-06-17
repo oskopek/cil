@@ -26,9 +26,9 @@ def define_flags():
 
     # Optimization parameters
     flags.DEFINE_integer('epochs', 15, 'Training epoch count')
-    flags.DEFINE_integer('batch_size', 32, 'Training batch size')
+    flags.DEFINE_integer('batch_size', 1000, 'Training batch size')
     flags.DEFINE_float('learning_rate', 3e-4, 'learning rate')
-    flags.DEFINE_float('grad_clip', 10.0, 'Gradient clipped to L2 norm smaller than or equal to.')
+    flags.DEFINE_float('grad_clip', 5.0, 'Gradient clipped to L2 norm smaller than or equal to.')
 
     # Jupyter notebook params
     # Only to avoid raising UnrecognizedFlagError
@@ -38,11 +38,11 @@ def define_flags():
     flags.DEFINE_string('rnn_cell', "LSTM", 'RNN cell type.')
     flags.DEFINE_integer('rnn_cell_dim', 128, 'RNN cell dimension.')
     flags.DEFINE_string('attention', 'add', 'Attention type (add ~ Bahdanau, mult ~ Luong, None).')
-    flags.DEFINE_integer('attention_size', 100, 'Attention size.')
+    flags.DEFINE_integer('attention_size', 128, 'Attention size.')
 
     # Embedding params
-    flags.DEFINE_integer('word_embedding', 200, 'word_embedding')
-    flags.DEFINE_integer('char_embedding', 200, 'char_embedding')
+    flags.DEFINE_integer('word_embedding', 300, 'word_embedding')
+    flags.DEFINE_integer('char_embedding', 70, 'char_embedding')
 
     # General model params
     flags.DEFINE_float('keep_prob', 0.5, 'dropout probability')
