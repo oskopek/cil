@@ -132,6 +132,5 @@ network = net_class(
 network.train(
     data,
     epochs=FLAGS.epochs,
-    batch_size=FLAGS.batch_size,
-    show_batch_metrics=FLAGS.show_batch_metrics)
+    batch_size=FLAGS.batch_size)
 print("End.")

@@ -75,16 +75,15 @@ class TwitterDataset:
                 for word, idx in words.items():
                     self._vocabularies[feature][idx] = word
 
-        self._new_permutation()
-
     def __len__(self):
         return len(self._word_ids)
 
-    def _new_permutation(self):
-        if self.is_train:
-            self._permutation = np.random.permutation(len(self._sentence_lens))
+    @staticmethod
+    def generate_permutation(ln, is_train=False):
+        if is_train:
+            return np.random.permutation(ln)
         else:
-            self._permutation = np.arange(len(self._sentence_lens))
+            return np.arange(ln)
 
     def vocabulary(self, feature):
         """Return vocabulary for required feature.
@@ -96,10 +95,11 @@ class TwitterDataset:
         """
         return self._vocabularies[feature]
 
-    def next_batch(self, batch_size):
+    def next_batch(self, batch_perm):  # TODO(oskopek): Make this faster for fixed padding.
         """Return the next batch.
 
-        Arguments:
+        Args:
+            batch_perm
         Returns: (sentence_lens, word_ids, charseq_ids, charseqs, charseq_lens, labels)
         sequence_lens: batch of sentence_lens
         word_ids: batch of word_ids
@@ -120,26 +120,6 @@ class TwitterDataset:
         charseq_lens: word_id -> len([char_id])
         char_vocab: char -> char_id
         """
-
-        batch_size = min(batch_size, len(self._permutation))
-        batch_perm = self._permutation[:batch_size]
-        self._permutation = self._permutation[batch_size:]
-        return self._next_batch(batch_perm)
-
-    def epoch_finished(self):
-        if len(self._permutation) == 0:
-            self._new_permutation()
-            return True
-        return False
-
-    def whole_data_as_batch(self):
-        """Return the whole dataset in the same result as next_batch.
-
-        Returns the same results as next_batch.
-        """
-        return self._next_batch(np.arange(len(self._sentence_lens)))
-
-    def _next_batch(self, batch_perm):  # TODO(oskopek): Make this faster for fixed padding.
         batch_size = len(batch_perm)
 
         # General data
@@ -185,8 +165,12 @@ class TwitterDataset:
 
     def batch_per_epoch_generator(self, batch_size, shuffle=True):
         assert self.is_train == shuffle
-        while not self.epoch_finished():
-            yield self.next_batch(batch_size)
+        permutation = self.generate_permutation(len(self), is_train=shuffle)
+        for n_batch in range(self.n_batches(batch_size=batch_size)):
+            batch_size = min(batch_size, len(permutation))
+            batch_perm = permutation[:batch_size]
+            permutation = permutation[batch_size:]
+            yield self.next_batch(batch_perm)
 
     def batches_per_epoch(self, batch_size: int = 1, shuffle: bool = True):
         n_batches = self.n_batches(batch_size=batch_size)

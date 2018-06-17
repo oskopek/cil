@@ -23,7 +23,6 @@ def define_flags():
     flags.DEFINE_boolean("no_gpu", False, 'Disables GPU usage even if a GPU is available')
     flags.DEFINE_integer('threads', 8, 'Maximum number of threads to use.')
     flags.DEFINE_integer('seed', 42, 'Random seed')
-    flags.DEFINE_bool('show_batch_metrics', False, 'Show batch metrics in progress bar (slow).')
 
     # Optimization parameters
     flags.DEFINE_integer('epochs', 15, 'Training epoch count')

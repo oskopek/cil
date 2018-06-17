@@ -152,33 +152,28 @@ class Model:
         fetches = [self.training_step, self.summaries["train"]]
         return self.session.run(fetches, self._build_feed_dict(batch, is_training=True))
 
-    def train(self, data: Datasets, epochs: int, batch_size: int,
-              show_batch_metrics: bool = False) -> None:
-        """
-        `show_batch_metrics` can be enabled, but takes up time during training.
-        """
-        epoch_tqdm = tqdm.tqdm(range(epochs), desc="Epochs")
+    def train(self, data: Datasets, epochs: int, batch_size: int) -> None:
         best_eval_accuracy = 0.0
-        for epoch in epoch_tqdm:
-            batch_count, batch_generator = data.train.batches_per_epoch(batch_size, shuffle=True)
-            batch_tqdm = tqdm.tqdm(range(batch_count), desc=f"Batches [Epoch {epoch}]")
-            for _ in batch_tqdm:
-                batch = next(batch_generator)
-                self.train_batch(batch)
-                if show_batch_metrics:
-                    batch_tqdm.set_postfix(self._train_metrics())
-            eval_metrics = self._eval_metrics(data, batch_size=batch_size)
-            epoch_tqdm.set_postfix(eval_metrics)
-            eval_accuracy = float(eval_metrics["eval_acc"])
-            if eval_accuracy > best_eval_accuracy:
-                best_eval_accuracy = eval_accuracy
-                test_predictions = self.predict_epoch(data.test, "test", batch_size=batch_size)
+        with tqdm.tqdm(range(epochs), desc="Epochs") as epoch_tqdm:
+            for epoch in epoch_tqdm:
+                batch_count, batch_generator = data.train.batches_per_epoch(batch_size,
+                    shuffle=True)
+                with tqdm.tqdm(range(batch_count), desc=f"Batches [Epoch {epoch}]") as batch_tqdm:
+                    for _ in batch_tqdm:
+                        batch = next(batch_generator)
+                        self.train_batch(batch)
+                eval_metrics = self._eval_metrics(data, batch_size=batch_size)
+                epoch_tqdm.set_postfix(eval_metrics)
+                eval_accuracy = float(eval_metrics["eval_acc"])
+                if eval_accuracy > best_eval_accuracy:
+                    best_eval_accuracy = eval_accuracy
+                    test_predictions = self.predict_epoch(data.test, "test", batch_size=batch_size)
 
-                # Print test predictions
-                out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_accuracy}.csv"
-                print_outputs(out_file, test_predictions, data.test.vocabulary('labels'))
-                print("Exported predictions to", out_file, flush=True)
-                print(flush=True)
+                    # Print test predictions
+                    out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_accuracy}.csv"
+                    print_outputs(out_file, test_predictions, data.test.vocabulary('labels'))
+                    print("Exported predictions to", out_file, flush=True)
+                    print(flush=True)
 
     def evaluate_epoch(self, data: TwitterDataset, dataset: str, batch_size: int) -> List[float]:
         self.session.run(self.reset_metrics)
