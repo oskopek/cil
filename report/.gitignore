@@ -1,0 +1,10 @@
+*.bak
+*.sav
+*.pdf
+*.aux
+*.synctex.gz
+*.out
+*.log
+*.cut
+*.bbl
+*.blg
