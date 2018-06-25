@@ -14,6 +14,7 @@ import tqdm
 
 class Model:
     EVERY_STEPS = 200
+    EVAL_EVERY_STEPS = 1000
 
     def _placeholders(self) -> None:
         self.global_step = tf.Variable(0, dtype=tf.int64, trainable=False, name="global_step")
@@ -149,11 +150,31 @@ class Model:
 
     def train_batch(self, batch: Tuple[Union[np.ndarray, bool], ...]) -> List[Any]:
         self.session.run(self.reset_metrics)
-        fetches = [self.training_step, self.summaries["train"]]
-        return self.session.run(fetches, self._build_feed_dict(batch, is_training=True))
+        fetches = [self.global_step, self.training_step, self.summaries["train"]]
+        return self.session.run(fetches, self._build_feed_dict(batch, is_training=True))[0]
+
+    def save(self, best_acc: float, cur_step: int) -> None:
 
     def train(self, data: Datasets, epochs: int, batch_size: int) -> None:
-        best_eval_accuracy = 0.0
+        def _save() -> None:
+            test_predictions = self.predict_epoch(data.test, "test", batch_size=batch_size)
+            # Print test predictions
+            out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_acc}.csv"
+            print_outputs(out_file, test_predictions, data.test.vocabulary('labels'))
+            print("Exported predictions to", out_file, flush=True)
+            print(flush=True)
+
+        def _eval(best_acc: float, cur_step: int) -> float:
+            metrics = self._eval_metrics(data, batch_size=batch_size)
+            epoch_tqdm.set_postfix(metrics)
+            eval_acc = float(metrics["eval_acc"])
+            if eval_acc > best_acc:
+                best_acc = eval_acc
+                _save(best_acc, cur_step)
+            return best_acc
+
+        best_eval_acc = .0
+        step = 0
         with tqdm.tqdm(range(epochs), desc="Epochs") as epoch_tqdm:
             for epoch in epoch_tqdm:
                 batch_count, batch_generator = data.train.batches_per_epoch(batch_size,
@@ -161,19 +182,11 @@ class Model:
                 with tqdm.tqdm(range(batch_count), desc=f"Batches [Epoch {epoch}]") as batch_tqdm:
                     for _ in batch_tqdm:
                         batch = next(batch_generator)
-                        self.train_batch(batch)
-                eval_metrics = self._eval_metrics(data, batch_size=batch_size)
-                epoch_tqdm.set_postfix(eval_metrics)
-                eval_accuracy = float(eval_metrics["eval_acc"])
-                if eval_accuracy > best_eval_accuracy:
-                    best_eval_accuracy = eval_accuracy
-                    test_predictions = self.predict_epoch(data.test, "test", batch_size=batch_size)
-
-                    # Print test predictions
-                    out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_accuracy}.csv"
-                    print_outputs(out_file, test_predictions, data.test.vocabulary('labels'))
-                    print("Exported predictions to", out_file, flush=True)
-                    print(flush=True)
+                        step = self.train_batch(batch)
+                        if step % EVALUATE_EVERY_STEP == 0:
+                            best_eval_acc = _eval(best_eval_acc, step)
+                if step % evaluate_every_steps == 0:
+                    best_eval_acc = _eval(best_eval_acc, step)
 
     def evaluate_epoch(self, data: TwitterDataset, dataset: str, batch_size: int) -> List[float]:
         self.session.run(self.reset_metrics)
