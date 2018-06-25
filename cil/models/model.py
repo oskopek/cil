@@ -36,6 +36,9 @@ class Model:
         # [] bool scalar
         self.is_training = tf.placeholder_with_default(False, [], name="is_training")
 
+        if hasattr(self, 'keep_prob'):
+            self.keep_prob_cond = tf.cond(self.is_training, lambda: tf.constant(self.keep_prob, dtype=tf.float32), lambda: tf.constant(1.0, dtype=tf.float32))
+
         self.placeholder_tensors = [
             self.sentence_lens, self.word_ids, self.charseq_ids, self.charseqs, self.charseq_lens,
             self.labels, self.is_training
@@ -112,6 +115,8 @@ class Model:
             self.predictions, self.loss, self.training_step = self.build_model()
             with tf.name_scope("summaries"):
                 self._summaries_and_init()
+
+            print("Variables:", tf.trainable_variables())
 
     def build_model(self) -> Tuple[tf.Tensor, tf.Tensor, tf.Operation]:
         """

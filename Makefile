@@ -13,7 +13,7 @@ check:
 	flake8 cil/ glove/
 
 job:
-	bsub -W 24:00 -n 4 -R "rusage[mem=2048, ngpus_excl_p=1]" ./train.sh $(filter-out $@,$(MAKECMDGOALS))
+	bsub -W 24:00 -n 4 -R "rusage[mem=3000, ngpus_excl_p=1]" ./train.sh $(filter-out $@,$(MAKECMDGOALS))
 
 status:
 	watch -n 1 bbjobs

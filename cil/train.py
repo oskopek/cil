@@ -8,6 +8,7 @@ from .models.cnn import CNN
 from .models.rnn import RNN
 from .models.rnn_we import RNNWE
 from .models.rnn_ce import RNNCE
+from .models.stackrnn import StackRNN
 from .data.preprocessing import Preprocessing
 from .data.datasets import Datasets
 
@@ -115,6 +116,8 @@ elif FLAGS.model == "RNNCE":
     net_class = RNNCE
 elif FLAGS.model == "CNN":
     net_class = CNN
+elif FLAGS.model == "StackRNN":
+    net_class = StackRNN
 else:
     raise ValueError(f"Unknown model {FLAGS.model}.")
 
