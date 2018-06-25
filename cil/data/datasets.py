@@ -1,5 +1,4 @@
 import numpy as np
-import sklearn
 
 from .twitter_dataset import TwitterDataset
 
@@ -40,25 +39,24 @@ class Datasets:
         self.padding_size = padding_size
 
     @staticmethod
-    def _read_lines(file):
-        with open(file, "r") as f:
-            lines = f.readlines()
-        return lines
+    def _read_lines(filename, quote='"'):
+        with open(filename, "r") as f:
+            X = []
+            y = []
+            reader = csv.reader(f, delimiter=',', quotechar=quote)
+            for label, line in reader:
+                X.append(line)
+                y.append(label)
+        return X, y
 
     def load(self):
         print("Loading data from disk...")
-        X_train_pos = Datasets._read_lines(self.train_pos_file)
-        X_train_neg = Datasets._read_lines(self.train_neg_file)
-        y_train = [1] * len(X_train_pos) + [0] * len(X_train_neg)
-        X_train = X_train_pos + X_train_neg
-        del X_train_pos, X_train_neg
-
-        X_test = Datasets._read_lines(self.test_file)
-        X_test = [line.split(sep=',', maxsplit=1)[1] for line in X_test]  # remove numbers
-
-        print("Splitting...")
-        X_train, X_eval, y_train, y_eval = sklearn.model_selection.train_test_split(
-            X_train, y_train, test_size=self.eval_size, random_state=self.random_state)
+        X_train, y_train = Datasets._read_lines(self.train_file)
+        X_eval, y_eval = Datasets._read_lines(self.eval_file)
+        X_test, _ = Datasets._read_lines(self.test_file, quote=None)
+        print(X_train[0], y_train[0])
+        print(X_eval[0], y_eval[0])
+        print(X_test[0]) # TODO: Debug
 
         print("Preprocessing...")
         X_train, y_train = self.preprocessing.transform(X_train, labels=y_train)
@@ -68,23 +66,14 @@ class Datasets:
         print("Generating vocabulary...")
         word_vocab, inv_word_vocab = self.preprocessing.vocab(
             X_train, vocab_downsize=self.vocab_size)
-        # X_train_word = self.preprocessing.vocab(
-        #     X_train, vocab_downsize=(word_vocab, inv_word_vocab))
-        # X_eval_word = self.preprocessing.vocab(
-        #     X_eval, vocab_downsize=(word_vocab, inv_word_vocab))
-        # X_test_word = self.preprocessing.vocab(
-        #     X_test, vocab_downsize=(word_vocab, inv_word_vocab))
 
         self.X_train = X_train
-        # self.X_train_word = X_train_word
         self.y_train = y_train
 
         self.X_eval = X_eval
-        # self.X_eval_word = X_eval_word
         self.y_eval = y_eval
 
         self.X_test = X_test
-        # self.X_test_word = X_test_word
 
         self.word_vocab = word_vocab
         self.inv_word_vocab = inv_word_vocab
