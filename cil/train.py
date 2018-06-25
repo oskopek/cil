@@ -36,10 +36,9 @@ if FLAGS.enable_preprocessing:
 
 # Load the data
 PREFIX = "data_in/twitter-datasets"
-full_data = '_full' if FLAGS.full_data else ''
 data = Datasets(
-    train_pos_file=f"{PREFIX}/train_pos{full_data}.txt",
-    train_neg_file=f"{PREFIX}/train_neg{full_data}.txt",
+    train_file=f"{PREFIX}/train_data.txt",
+    eval_file=f"{PREFIX}/eval_data.txt",
     test_file=f"{PREFIX}/test_data.txt",
     preprocessing=preprocessing,
     eval_size=FLAGS.eval_size,
@@ -112,8 +111,7 @@ if FLAGS.model == "RNN":
 elif FLAGS.model == "CNN":
     net_class = CNN
 
-expname = f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}'
-expname = f'{expname}{full_data}'
+expname = f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}_ttfull'
 
 network = net_class(
     rnn_cell=FLAGS.rnn_cell,

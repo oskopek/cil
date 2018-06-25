@@ -1,9 +1,3 @@
-# Glove Twitter embeddings (TODO(oskopek): Try different ones)
-# !wget http://nlp.stanford.edu/data/glove.twitter.27B.zip
-# !unzip glove.twitter.27B.zip
-# Produces files: glove.twitter.27B.100d.txt  glove.twitter.27B.200d.txt
-#                 glove.twitter.27B.25d.txt   glove.twitter.27B.50d.txt
-
 from typing import Tuple
 
 import tensorflow as tf
@@ -192,9 +186,9 @@ class RNN(Model):
 
     def _fc(self, x):
         x = tf.layers.dropout(x, rate=self.keep_prob, training=self.is_training)
-        x = tf.layers.dense(x, 256, activation=tf.nn.leaky_relu)
+        x = tf.layers.dense(x, 256, activation=tf.nn.relu)
         x = tf.layers.dropout(x, rate=self.keep_prob, training=self.is_training)
-        x = tf.layers.dense(x, 256, activation=tf.nn.leaky_relu)
+        x = tf.layers.dense(x, 256, activation=tf.nn.relu)
         x = tf.layers.dropout(x, rate=self.keep_prob, training=self.is_training)
         output_layer = tf.layers.dense(x, self.CLASSES, activation=None)
         print("output_layer", output_layer.get_shape())

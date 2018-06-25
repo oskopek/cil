@@ -1,3 +1,5 @@
+import csv
+
 import numpy as np
 
 from .twitter_dataset import TwitterDataset
@@ -21,18 +23,17 @@ class Datasets:
     test = None
 
     def __init__(self,
-                 train_pos_file,
-                 train_neg_file,
+                 train_file,
+                 eval_file,
                  test_file,
                  preprocessing,
                  eval_size=0.33,
                  random_state=42,
                  vocab_size=20000,
                  padding_size=40):
-        self.train_pos_file = train_pos_file
-        self.train_neg_file = train_neg_file
+        self.train_file = train_file
+        self.eval_file = eval_file
         self.test_file = test_file
-        self.eval_size = eval_size
         self.random_state = random_state
         self.preprocessing = preprocessing
         self.vocab_size = vocab_size
