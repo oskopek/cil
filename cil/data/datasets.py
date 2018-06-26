@@ -1,5 +1,3 @@
-import csv
-
 import numpy as np
 
 from .twitter_dataset import TwitterDataset
@@ -27,7 +25,6 @@ class Datasets:
                  eval_file,
                  test_file,
                  preprocessing,
-                 eval_size=0.33,
                  random_state=42,
                  vocab_size=20000,
                  padding_size=40):
@@ -44,10 +41,10 @@ class Datasets:
         with open(filename, "r") as f:
             X = []
             y = []
-            reader = csv.reader(f, delimiter=',', quotechar=quote)
-            for label, line in reader:
-                X.append(line)
-                y.append(label)
+            for line in f:
+                label, line = line.split(',', maxsplit=1)
+                X.append(line.rstrip())
+                y.append(int(label))
         return X, y
 
     def load(self):

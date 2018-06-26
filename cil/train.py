@@ -41,7 +41,6 @@ data = Datasets(
     eval_file=f"{PREFIX}/eval_data.txt",
     test_file=f"{PREFIX}/test_data.txt",
     preprocessing=preprocessing,
-    eval_size=FLAGS.eval_size,
     vocab_size=FLAGS.vocab_size,
     padding_size=FLAGS.padding_size)
 data.load()

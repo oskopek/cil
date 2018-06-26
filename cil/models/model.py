@@ -14,7 +14,7 @@ import tqdm
 
 class Model:
     EVERY_STEPS = 200
-    EVAL_EVERY_STEPS = 1000
+    EVALUATE_EVERY_STEP = 7500  # 10 times per epoch on 32 batch size.
 
     def _placeholders(self) -> None:
         self.global_step = tf.Variable(0, dtype=tf.int64, trainable=False, name="global_step")
@@ -153,10 +153,8 @@ class Model:
         fetches = [self.global_step, self.training_step, self.summaries["train"]]
         return self.session.run(fetches, self._build_feed_dict(batch, is_training=True))[0]
 
-    def save(self, best_acc: float, cur_step: int) -> None:
-
     def train(self, data: Datasets, epochs: int, batch_size: int) -> None:
-        def _save() -> None:
+        def _save(eval_acc: float) -> None:
             test_predictions = self.predict_epoch(data.test, "test", batch_size=batch_size)
             # Print test predictions
             out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_acc}.csv"
@@ -170,7 +168,7 @@ class Model:
             eval_acc = float(metrics["eval_acc"])
             if eval_acc > best_acc:
                 best_acc = eval_acc
-                _save(best_acc, cur_step)
+                _save(eval_acc)
             return best_acc
 
         best_eval_acc = .0
@@ -183,9 +181,9 @@ class Model:
                     for _ in batch_tqdm:
                         batch = next(batch_generator)
                         step = self.train_batch(batch)
-                        if step % EVALUATE_EVERY_STEP == 0:
+                        if step % self.EVALUATE_EVERY_STEP == 0:
                             best_eval_acc = _eval(best_eval_acc, step)
-                if step % evaluate_every_steps == 0:
+                if step % self.EVALUATE_EVERY_STEP == 0:
                     best_eval_acc = _eval(best_eval_acc, step)
 
     def evaluate_epoch(self, data: TwitterDataset, dataset: str, batch_size: int) -> List[float]:

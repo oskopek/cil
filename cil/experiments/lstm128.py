@@ -31,8 +31,8 @@ def define_flags():
     flags.DEFINE_string('f', 'kernel', 'Kernel')
 
     # RNN params
-    flags.DEFINE_string('rnn_cell', "GRU", 'RNN cell type.')
-    flags.DEFINE_integer('rnn_cell_dim', 256, 'RNN cell dimension.')
+    flags.DEFINE_string('rnn_cell', "LSTM", 'RNN cell type.')
+    flags.DEFINE_integer('rnn_cell_dim', 128, 'RNN cell dimension.')
     flags.DEFINE_string('attention', None, 'Attention type (add ~ Bahdanau, mult ~ Luong, None).')
     flags.DEFINE_integer('attention_size', 128, 'Attention size.')
 
