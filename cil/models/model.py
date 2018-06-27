@@ -155,7 +155,7 @@ class Model:
 
     def train(self, data: Datasets, epochs: int, batch_size: int) -> None:
         def _save(eval_acc: float) -> None:
-            test_predictions = self.predict_epoch(data.test, "test", batch_size=batch_size)
+            test_predictions = self.predict_epoch(data.test, "test", batch_size=1024)
             # Print test predictions
             out_file = f"data_out/pred_{self.exp_id}_epoch_{epoch}_acc{eval_acc}.csv"
             print_outputs(out_file, test_predictions, data.test.vocabulary('labels'))
@@ -188,7 +188,7 @@ class Model:
 
     def evaluate_epoch(self, data: TwitterDataset, dataset: str, batch_size: int) -> List[float]:
         self.session.run(self.reset_metrics)
-        for batch in data.batch_per_epoch_generator(batch_size, shuffle=False):
+        for batch in data.batch_per_epoch_generator(1024, shuffle=False):
             self.session.run(self.update_metrics, self._build_feed_dict(batch))
         returns = self.session.run(self.current_metrics + [self.summaries[dataset]])
         return returns[:len(self.current_metrics)]  # return current metrics
