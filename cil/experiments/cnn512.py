@@ -13,7 +13,7 @@ def define_flags():
     flags.DEFINE_string('checkpoint_path', None, 'Checkpoint to load. If none, ignored.')
 
     # Model choice
-    flags.DEFINE_string('model', 'RNNWE', 'Model choice.')
+    flags.DEFINE_string('model', 'CNN', 'Model choice.')
 
     # TF parameters
     flags.DEFINE_boolean("no_gpu", False, 'Disables GPU usage even if a GPU is available')

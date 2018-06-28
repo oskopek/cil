@@ -222,7 +222,6 @@ class RNN(Model):
             with tf.name_scope("optimizer"):
                 optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
                 gradients = optimizer.compute_gradients(loss)
-                # TODO(oskopek): Only clip RNN gradients?
                 clipped_gradients = [(tf.clip_by_norm(gradient, self.grad_clip), var)
                                      for gradient, var in gradients]
                 training_step = optimizer.apply_gradients(

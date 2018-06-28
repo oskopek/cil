@@ -4,8 +4,11 @@ import nltk
 import numpy as np
 
 from . import flags
-from .models.rnn import RNN
 from .models.cnn import CNN
+from .models.elmo import Elmo
+from .models.rnn import RNN
+from .models.rnn_we import RNNWE
+from .models.rnn_ce import RNNCE
 from .data.preprocessing import Preprocessing
 from .data.datasets import Datasets
 
@@ -107,8 +110,16 @@ print("Constructing the network.", flush=True)
 
 if FLAGS.model == "RNN":
     net_class = RNN
+elif FLAGS.model == "RNNWE":
+    net_class = RNNWE
+elif FLAGS.model == "RNNCE":
+    net_class = RNNCE
 elif FLAGS.model == "CNN":
     net_class = CNN
+elif FLAGS.model == "Elmo":
+    net_class = Elmo
+else:
+    raise ValueError(f"Unknown model {FLAGS.model}.")
 
 expname = f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}_ttfull'
 
