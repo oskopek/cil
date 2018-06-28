@@ -5,7 +5,6 @@ import numpy as np
 
 from . import flags
 from .models.cnn import CNN
-from .models.elmo import Elmo
 from .models.rnn import RNN
 from .models.rnn_we import RNNWE
 from .models.rnn_ce import RNNCE
@@ -116,8 +115,6 @@ elif FLAGS.model == "RNNCE":
     net_class = RNNCE
 elif FLAGS.model == "CNN":
     net_class = CNN
-elif FLAGS.model == "Elmo":
-    net_class = Elmo
 else:
     raise ValueError(f"Unknown model {FLAGS.model}.")
 
