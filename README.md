@@ -3,7 +3,8 @@
 Department of Computer Science, ETH Zurich, Switzerland
 
 ## Project definition
-The use of microblogging and text messaging as a media of communication has greatly increased over the past 10 years. Such large volumes of data amplifies the need for automatic methods to understand the opinion conveyed in a text.
+
+Perform text sentiment classification on Twitter data (tweets). The goal is to develop an automatic method to reveal the authors' opinion/sentiment.
 
 ## Report
 
