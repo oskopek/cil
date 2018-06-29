@@ -24,8 +24,14 @@ rm glove.twitter.27B.100d.txt
 python3 pickle_vocab.py	
 python3 cooc.py
 
-#Run the glove embedding sentiment classification using own embeddings that will be trained
-python3 glove_embeddings.py
+#Run the glove embedding sentiment classification with random forest and stanford embeddings
+python3 glove_embeddings.py 0 1
 
-#Run the glove embedding sentiment classification using stanford embeddings
-python3 glove_embeddings.py useStanford
+#Run the glove embedding sentiment classification with logistic regression and stanford embeddings
+python3 glove_embeddings.py 1 1
+
+#Run the glove embedding sentiment classification with random forest and self-computed embeddings
+python3 glove_embeddings.py 0 0
+
+#Run the glove embedding sentiment classification with logistic regression and self-computed embeddings
+python3 glove_embeddings.py 1 0
