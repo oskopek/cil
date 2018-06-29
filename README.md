@@ -62,7 +62,8 @@ sudo apt-get update && sudo apt-get install tensorflow-model-server
 
 
 #### Ensemble vote
-This was computed offline using Excel. The Excel sheet we used is uploaded to `data_out` and named `prediction_ensemble.xlsx`
+This ensemble vote was computed offline using Excel taking our 5 best models and classifying based on the majority vote. 
+The Excel sheet we used is uploaded to `data_out` and named `prediction_ensemble.xlsx`
 
 
 
