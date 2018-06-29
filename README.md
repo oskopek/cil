@@ -56,60 +56,40 @@ curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.re
 sudo apt-get update && sudo apt-get install tensorflow-model-server
 ```
 
-#### Glove
-
-
 
 #### Fasttext
 
 
 
 #### Ensemble vote
-
-
+This was computed offline using Excel. The Excel sheet we used is uploaded to `data_out` and named `prediction_ensemble.xlsx`
 
 
 
 ## Structure
-
-* `datasets/` - all data sources required for training/validation/testing.
-* `notebooks/` - visualization notebooks.
-* `outputs/` - any output for a model will be placed here, including logs, summaries, checkpoints, and Kaggle submission `.csv` files.
-* `report/` - report sources and PDF.
-* `src/` - all source code.
-    * `core/` - base classes
-    * `datasources/` - routines for reading and preprocessing entries for training and testing
+* `cil/` - 
+    * `data/` - data loading and preprocessing
     * `models/` - neural network definitions
-    * `schedules/` - training schedules
-    * `synthgan/` - synthetic refinement of UnityEyes using CycleGan.
-    * `util/` - utility methods
-    * `main.sh` - main training script to run
-    * `train.py` - training script for VGG19
-* `setup/` - environment setup scripts and configuration files.
-* `venv/` - the virtualenv.
+* `data_in/` - input twitter data
+* `data_out/` - output data for kaggle
+* `glove` - glove embeddings with logistic regression or the random forest
+* `report/` - the final report/paper
+* `transformer/` - transformer model
 
-### Outputs
-
-When your model has completed training, it will perform a full evaluation on the test set. For class `ExampleNet`, this output can be found in the folder `outputs/ExampleNet/` as `to_submit_to_kaggle_XXXXXXXXX.csv`.
-
-Submit this `csv` file to our page on [Kaggle](https://www.kaggle.com/c/mp18-eye-gaze-estimation/submissions).
+TODO add fasttext data
 
 
 ### Training Data
-For this problem, we have acquired 2.5M tweets classified as either positive or negative.
-
-### Evaluation Metrics
-*Classification Accuracy*
-
-## File description
-
+2.5M tweets classified as either positive or negative.
 * `train_pos.txt` and `train_neg.txt` -- a small set of training tweets for each of the two classes.
 * `train_pos_full.txt` and `train_neg_full.txt` -- a complete set of training tweets for each of the two classes, about 1M tweets per class.
-* `test_data.txt` -- the test set, that is the tweets for which you have to predict the sentiment label.
-* `sampleSubmission.csv` -- a sample submission file in the correct format, note that each test tweet is numbered.
-  * Submission of predictions: -1 = negative prediction, 1 = positive prediction
+All tweets have been tokenized already, so that the words and punctuation are properly separated by a whitespace.
 
-Note that all tweets have been tokenized already, so that the words and punctuation are properly separated by a whitespace.
+ 
+### Evaluation Metrics
+The evaluation metrics is *Classification Accuracy*
+* `test_data.txt` -- the test set, that is the tweets for which you have to predict the sentiment label.
+
 
 ## Pre-processing Techniques
 
