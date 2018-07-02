@@ -56,26 +56,27 @@ curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.re
 sudo apt-get update && sudo apt-get install tensorflow-model-server
 ```
 
-
 #### Fasttext
 
-
+TODO fasttext
 
 #### Ensemble vote
-This ensemble vote was computed offline using Excel taking our 5 best models and classifying based on the majority vote. 
+
+The ensemble vote was computed offline using Excel taking our 5 best models and classifying based on the majority vote. 
 The Excel sheet we used is uploaded to `data_out` and named `prediction_ensemble.xlsx`
 
 
 
 ## Structure
-* `cil/` - 
+
+* `cil/` - root Python package for most models.
     * `data/` - data loading and preprocessing
     * `models/` - neural network definitions
-* `data_in/` - input twitter data
-* `data_out/` - output data for kaggle
-* `glove` - glove embeddings with logistic regression or the random forest
-* `report/` - the final report/paper
-* `transformer/` - transformer model
+* `data_in/` - input twitter data and preprocessed data
+* `data_out/` - output predictions, tensorboard events, ...
+* `glove` - glove embeddings with logistic regression or random forests
+* `report/` - the final report
+* `transformer/` - the transformer model
 
 TODO add fasttext data
 
