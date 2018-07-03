@@ -1,7 +1,7 @@
 setup:
 	python -m pip install -r requirements.txt --user
 	python -c 'import nltk; nltk.download("punkt")'
-	cd data && ./download_data.sh
+	cd data_in && ./download_data.sh
 
 clean:
 	yapf -ir cil/ glove/ fasttext/
