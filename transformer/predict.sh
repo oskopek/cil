@@ -2,7 +2,7 @@ PROBLEM=sentiment_twitter
 MODEL=transformer_encoder
 HPARAMS=transformer_tiny
 
-CIL_DIR=$HOME
+CIL_DIR=".."
 USR_DIR=$CIL_DIR/t2t/usr_dir
 DATA_DIR=$CIL_DIR/t2t_data
 TMP_DIR=$CIL_DIR/t2t_datagen

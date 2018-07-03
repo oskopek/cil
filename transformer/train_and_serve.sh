@@ -4,7 +4,7 @@ MODEL=transformer_encoder
 HPARAMS=transformer_tiny
 
 # Point to working directory path
-CIL_DIR=$HOME
+CIL_DIR=".."
 # Point to the current directory where the usr_dir is! 
 USR_DIR=$CIL_DIR/transformer/usr_dir
 DATA_DIR=$CIL_DIR/t2t_data

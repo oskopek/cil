@@ -4,16 +4,16 @@ setup:
 	cd data && ./download_data.sh
 
 clean:
-	yapf -ir cil/ glove/
+	yapf -ir cil/ glove/ fasttext/
 
 train:
-	python -m cil.train $(filter-out $@,$(MAKECMDGOALS))
+	python -m cil.train
 
 check:
-	flake8 cil/ glove/
+	flake8 cil/ glove/ fasttext/
 
 job:
-	bsub -W 24:00 -n 4 -R "rusage[mem=3000, ngpus_excl_p=1]" ./train.sh $(filter-out $@,$(MAKECMDGOALS))
+	bsub -W 24:00 -n 4 -R "rusage[mem=3000, ngpus_excl_p=1]" ./train.sh
 
 status:
 	watch -n 1 bbjobs
@@ -24,31 +24,31 @@ output:
 # Experiments
 
 lstm128:
-	p
+	cp cil/experiments/lstm128.py cil/flags.py
 
 lstm128_ce:
-	p
+	cp cil/experiments/lstm128_ce.py cil/flags.py
 
 lstm128_we:
-	p
+	cp cil/experiments/lstm128_we.py cil/flags.py
 
 gru256:
-	p
+	cp cil/experiments/gru256.py cil/flags.py
 
 stacklstm:
-	p
+	cp cil/experiments/stacklstm.py cil/flags.py
 
-transformer:
-	p
+transformer-train-serve:
+	cd transformer && ./train_and_serve.sh
 
-glove-rf:
-	p
+transformer-predict:
+	cd transformer && ./predict.sh
 
-glove-lr:
-	p
+glove:
+	cd glove && ./run.sh
 
 cnn512:
-	p
+	cp cil/experiments/cnn512.py cil/flags.py
 
 fasttext:
 	./train_fasttext.sh
@@ -58,4 +58,4 @@ fasttext:
 %:
 	@:
 
-.PHONY: setup train check job status output fasttext
+.PHONY: setup clean train check job status output lstm128 lstm128_ce lstm128_we gru256 stacklstm transformer-train-serve transformer-predict glove cnn512 fasttext
