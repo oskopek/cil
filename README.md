@@ -25,9 +25,13 @@ For Tensorflow on CPU, change the `tensorflow-gpu` line in `requirements.txt` to
 ## Training
 
 To train, run `make train` from the main project folder.
+To train on Leonhard (submit a job), run `make job` from the main project folder.
 The model specified by `cil/flags.py` will be trained.
 
-You can also run the experiments from make directly:
+### Neural network experiments
+
+You can setup the training to use a specific experiment by running one of the following commands
+prior to `make train` or `make job`:
 
 ```
 make lstm128
@@ -36,15 +40,21 @@ make lstm128_we
 make gru256
 make stacklstm
 make cnn512
-make glove_lr
-make glove_rf
-make fasttext
-make transformer
 ```
 
-### Special cases
+### Baselines and external models
 
-For some special cases, we provide additional instructions for training.
+Use the following commands to directly run the baselines and external models.
+You may need to change paths in the beginning of scripts (especially for fasttext),
+if you are not running the models on Leonhard.
+
+```
+make glove
+make transformer
+make fasttext
+```
+
+To run Transformer and FastText, please read on for some preconditions and requirements.
 
 #### Transformer
 
@@ -56,88 +66,45 @@ curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.re
 sudo apt-get update && sudo apt-get install tensorflow-model-server
 ```
 
-#### Fasttext
+#### FastText
 
-TODO fasttext
+Please make sure you have `make`, `gcc`/`g++`, and other standard Linux build tools installed to build FastText.
 
-#### Ensemble vote
 
-The ensemble vote was computed offline using Excel taking our 5 best models and classifying based on the majority vote. 
+### Ensemble
+
+The ensemble was computed offline using Excel, classifying based on the majority
+vote on the test set predictions.
 The Excel sheet we used is uploaded to `data_out` and named `prediction_ensemble.xlsx`
 
 
+## Project structure
 
-## Structure
-
-* `cil/` - root Python package for most models.
+* `cil/` - root Python package for all our neural models, data loading, ...
     * `data/` - data loading and preprocessing
-    * `models/` - neural network definitions
-* `data_in/` - input twitter data and preprocessed data
-* `data_out/` - output predictions, tensorboard events, ...
+    * `experiments/` - flag files for reproducing experiments from the report
+    * `models/` - neural network architecture implementations
+* `data_in/` - input twitter data and preprocessed data + some preprocessing scripts
+* `data_out/` - output predictions, TensorBoard events, ensemble spreadsheet, ...
+* `fasttext/` - scripts to run the FastText classifier
 * `glove` - glove embeddings with logistic regression or random forests
 * `report/` - the final report
-* `transformer/` - the transformer model
-
-TODO add fasttext data
+* `transformer/` - the Transformer model
 
 
-### Training Data
-2.5M tweets classified as either positive or negative.
+## Training Data
+
+The training data consists of 2.5M tweets classified as either positive or negative.
+All tweets have been tokenized already, so that the words and punctuation are properly separated by a whitespace.
+All our data files are in `data_in/twitter-datasets/`.
+
+The original files were:
 * `train_pos.txt` and `train_neg.txt` -- a small set of training tweets for each of the two classes.
 * `train_pos_full.txt` and `train_neg_full.txt` -- a complete set of training tweets for each of the two classes, about 1M tweets per class.
-All tweets have been tokenized already, so that the words and punctuation are properly separated by a whitespace.
 
- 
-### Evaluation Metrics
-The evaluation metrics is *Classification Accuracy*
-* `test_data.txt` -- the test set, that is the tweets for which you have to predict the sentiment label.
+For all our experiments, we used a fixed train/eval/test split, computed by the `data_in/train_test_split.py`
+(with a fixed random seed) script upon running the setup using `make setup`.
+The data split (after running setup) is available at:
+* `data_in/twitter-datasets/train_data.txt`
+* `data_in/twitter-datasets/eval_data.txt`
 
-
-## Pre-processing Techniques
-
-
-0.	~~Basic (Remove Unicode strings and noise), already done~~
-
----
-
-1.	**Remove Numbers (Best)**
-2.	**Replace Repetitions of Punctuation (Best)**
-3.	~~Handling Capitalized Words (Poor)~~
-4.	~~Lowercase, already done~~
-5.	~~Replace Slang and Abbreviations (Poor)~~ FIX them instead.
-6.	**Replace Elongated Words (Varying)**
-7.	~~**Replace Contractions (Varying)**~~
-8.	~~Replace negations with antonyms (Poor)~~
-9.	**Handling Negations (High)**
-10.	*Remove Stopwords (Poor)*
-11.	**Stemming (Best)**
-12.	**Lemmatizing (High)**
-13.	~~Other (Replace urls and user mentions) (High), already done~~
-14.	~~Spelling Correction (Poor)~~
-15.	~~Remove Punctuation (Poor)~~
-
-
-Source: https://link.springer.com/chapter/10.1007%2F978-3-319-67008-9_31 Effrosynidis D., Symeonidis S., Arampatzis A. (2017) A Comparison of Pre-processing Techniques for Twitter Sentiment Analysis. In: Kamps J., Tsakonas G., Manolopoulos Y., Iliadis L., Karydis I. (eds) Research and Advanced Technology for Digital Libraries. TPDL 2017. Lecture Notes in Computer Science, vol 10450. Springer, Cham
-
-## Status
-
-Right now, we have a preprocessing class that hasn't been too rigorously tested, but should mostly work, except for TODOs.
-We need to experiment with it a bit more to the find best settings for our data. Also, the model can be changed (the most obvious optimization might be to *remove* char embeddings).
-
-## TODOs and ideas
-
-* Add pre-trained embeddings (Glove, word2vec, fasttext, ELMO, etc)
-  * https://www.tensorflow.org/hub/modules/google/elmo/1
-* Experiment with architecture (CNNs, remove char embeddings, etc)
-* Experiment with preprocessing and its flags, vocab size, etc
-* Try sub-word embeddings
-* Add TF-IDF weighting 
-* Try http://spacy.io ?
-* Add F1-score, prec/recall, embedding visualization
-* Remove notebooks?
-* Remove <URL> tokens?
-* Look at RCNN, Lukas thinks it did exactly this thing on this dataset (custom LSTM cell)
-* Optimize vocab size: Look at number of unique words (or actually, at the words themselves).
-* ~~Gradient clipping~~
-* Try different cells (current -- GRU)
-* Remove retweets from dataset (RT and existing tweet after it)
