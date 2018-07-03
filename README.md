@@ -1,34 +1,36 @@
 # Computational Intelligence Lab 2018 -- Text Sentiment Classification
-### Larissa Laich, Lukas Jendele, Michael Wiegner, Ondrej Skopek
+### Larissa Laich, Lukas Jendele, Ondrej Skopek, Michael Wiegner
 Department of Computer Science, ETH Zurich, Switzerland
 
-## Project definition
+## 1. Project definition
 
 Perform text sentiment classification on Twitter data (tweets). The goal is to develop an automatic method to reveal the authors' opinion/sentiment.
 
-## Report
+## 2. Report
 
 The report is located at: `report/report.pdf`.
 
-## Setup
+## 3. Setup
 
 The following two steps will prepare your environment to begin training and evaluating models.
 
-Simply run
+For Tensorflow on CPU, change the `tensorflow-gpu` line in `requirements.txt` to `tensorflow`.
+Do note that we expect the usual Linux utilities to be installed, f.e. `bash`, `wget`, etc.
+We also expect the executables `python` and `python3` to point to a Python 3.6 or newer version of Python.
+For downloading the data (part of the setup process), please make sure to be on the ETH network.
 
+After everything is ready, simply run:
 ```
 make setup # for Tensorflow on GPU
 ```
 
-For Tensorflow on CPU, change the `tensorflow-gpu` line in `requirements.txt` to `tensorflow`.
-
-## Training
+## 4. Training
 
 To train, run `make train` from the main project folder.
 To train on Leonhard (submit a job), run `make job` from the main project folder.
 The model specified by `cil/flags.py` will be trained.
 
-### Neural network experiments
+### 4.1. Neural network experiments
 
 You can setup the training to use a specific experiment by running one of the following commands
 prior to `make train` or `make job`:
@@ -42,7 +44,7 @@ make stacklstm
 make cnn512
 ```
 
-### Baselines and external models
+### 4.2. Baselines and external models
 
 Use the following commands to directly run the baselines and external models.
 You may need to change paths in the beginning of scripts (especially for fasttext),
@@ -56,7 +58,7 @@ make fasttext
 
 To run Transformer and FastText, please read on for some preconditions and requirements.
 
-#### Transformer
+#### 4.2.1. Transformer
 
 You need to install the TensorFlow serving server:
 
@@ -66,19 +68,19 @@ curl https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.re
 sudo apt-get update && sudo apt-get install tensorflow-model-server
 ```
 
-#### FastText
+#### 4.2.2. FastText
 
 Please make sure you have `make`, `gcc`/`g++`, and other standard Linux build tools installed to build FastText.
 
 
-### Ensemble
+### 4.3. Ensemble
 
 The ensemble was computed offline using Excel, classifying based on the majority
 vote on the test set predictions.
 The Excel sheet we used is uploaded to `data_out` and named `prediction_ensemble.xlsx`
 
 
-## Project structure
+## 5. Project structure
 
 * `cil/` - root Python package for all our neural models, data loading, ...
     * `data/` - data loading and preprocessing
@@ -92,7 +94,7 @@ The Excel sheet we used is uploaded to `data_out` and named `prediction_ensemble
 * `transformer/` - the Transformer model
 
 
-## Training Data
+## 6. Training Data
 
 The training data consists of 2.5M tweets classified as either positive or negative.
 All tweets have been tokenized already, so that the words and punctuation are properly separated by a whitespace.
