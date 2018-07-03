@@ -1,77 +1,287 @@
-@Article{kallet04methods,
-  author = 	 {Richard H Kallet},
-  title = 	 {How to Write the Methods Section of a Research Paper},
-  journal = 	 {Respiratory Care},
-  year = 	 2004,
-  volume =	 49,
-  number =	 10,
-  pages =	 {1229--1232}
+@article{dropout1,
+  author        = {Hinton, Geoffrey E. and Srivastava, Nitish and Krizhevsky, Alex and Sutskever, Ilya and Salakhutdinov, Ruslan R.},
+  title         = {{Improving neural networks by preventing co-adaptation of feature detectors}},
+  year          = {2012},
+  issn          = {9781467394673},
+  archiveprefix = {arXiv},
+  arxivid       = {1207.0580},
+  doi           = {arXiv:1207.0580},
+  isbn          = {9781467394673},
+  pmid          = {1000104337},
+  url           = {http://arxiv.org/abs/1207.0580}
 }
 
-@Unpublished{anderson04,
-  author = 		 {Greg Anderson},
-  title = 		 {How to Write a Paper in Scientific Journal Style and Format},
-  year = 	 2004,
-  organization = {Bates College},
-  note = {http://abacus.bates.edu/~ganderso/biology/resources/writing/HTWtoc.html}
+
+@article{dropout2,
+abstract = {Deep neural nets with a large number of parameters are very powerful machine learning systems. However, overfitting is a serious problem in such networks. Large networks are also slow to use, making it difficult to deal with overfitting by combining the predictions of many different large neural nets at test time. Dropout is a technique for addressing this problem. The key idea is to randomly drop units (along with their connections) from the neural network during training. This prevents units from co-adapting too much. During training, dropout samples from an exponential number of different " thinned " networks. At test time, it is easy to approximate the effect of averaging the predictions of all these thinned networks by simply using a single unthinned network that has smaller weights. This significantly reduces overfitting and gives major improvements over other regularization methods. We show that dropout improves the performance of neural networks on supervised learning tasks in vision, speech recognition, document classification and computational biology, obtaining state-of-the-art results on many benchmark data sets.},
+archivePrefix = {arXiv},
+arxivId = {1102.4807},
+author = {Srivastava, Nitish and Hinton, Geoffrey and Krizhevsky, Alex and Sutskever, Ilya and Salakhutdinov, Ruslan},
+doi = {10.1214/12-AOS1000},
+isbn = {1532-4435},
+issn = {15337928},
+journal = {Journal of Machine Learning Research},
+keywords = {deep learning,model combination,neural networks,regularization},
+mendeley-groups = {Machine Perception/project},
+pages = {1929--1958},
+pmid = {23285570},
+title = {{Dropout: A Simple Way to Prevent Neural Networks from Overfitting}},
+url = {https://www.cs.toronto.edu/{~}hinton/absps/JMLRdropout.pdf},
+volume = {15},
+year = {2014}
 }
 
-@Unpublished{jones08,
-  author = 		 {Simon Peyton Jones},
-  title = 		 {How to write a great research paper},
-  note = 		 {Microsoft Research Cambridge},
-  year = 	 2008}
-
-@Article{editor10,
-  author = 		 {Editorial},
-  title = 		 {Scientific writing 101},
-  journal = 	 {Nature Structural \& Molecular Biology},
-  year = 		 2010,
-  volume = 	 17,
-  pages = 	 139}
-
-@TechReport{wavelab,
-  author = 		 {Jonathan B. Buckheit and David L. Donoho},
-  title = 		 {WaveLab and Reproducible Research},
-  institution =  {Stanford University},
-  year = 		 2009}
-
-@article{gentleman05,
-        title = {Reproducible Research: A Bioinformatics Case Study},
-        author = {Gentleman, Robert},
-        year = {2005},
-        journal = {Statistical Applications in Genetics and Molecular Biology},
-        volume = 4,
-        number = 1,
-        publisher = {The Berkeley Electronic Press},
-        url = {http://www.bepress.com/sagmb/vol4/iss1/art2}
+@article{adam,
+abstract = {We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss AdaMax, a variant of Adam based on the infinity norm.},
+archivePrefix = {arXiv},
+arxivId = {1412.6980},
+author = {Kingma, Diederik P. and Ba, Jimmy Lei},
+journal = {International Conference on Learning Representations (ICRL)},
+month = {dec},
+title = {{Adam: A Method for Stochastic Optimization}},
+url = {http://arxiv.org/abs/1412.6980},
+year = {2015}
 }
 
-@article{schwab00,
- author = {Schwab, Matthias and Karrenbach, Martin and Claerbout, Jon},
- title = {Making scientific computations reproducible},
- journal = {Computing in Science and Engg.},
- volume = {2},
- number = {6},
- year = {2000},
- issn = {1521-9615},
- pages = {61--67},
- doi = {http://dx.doi.org/10.1109/5992.881708},
- publisher = {IEEE Educational Activities Department},
- address = {Piscataway, NJ, USA},
- }
+@inproceedings{tensorflow,
+abstract = {TensorFlow is a machine learning system that operates at large scale and in heterogeneous environments. Tensor-Flow uses dataflow graphs to represent computation, shared state, and the operations that mutate that state. It maps the nodes of a dataflow graph across many machines in a cluster, and within a machine across multiple com-putational devices, including multicore CPUs, general-purpose GPUs, and custom-designed ASICs known as Tensor Processing Units (TPUs). This architecture gives flexibility to the application developer: whereas in previ-ous " parameter server " designs the management of shared state is built into the system, TensorFlow enables develop-ers to experiment with novel optimizations and training al-gorithms. TensorFlow supports a variety of applications, with a focus on training and inference on deep neural net-works. Several Google services use TensorFlow in pro-duction, we have released it as an open-source project, and it has become widely used for machine learning research. In this paper, we describe the TensorFlow dataflow model and demonstrate the compelling performance that Tensor-Flow achieves for several real-world applications.},
+archivePrefix = {arXiv},
+arxivId = {1605.08695},
+author = {Abadi, Mart{\'{i}}n and Barham, Paul and Chen, Jianmin and Chen, Zhifeng and Davis, Andy and Dean, Jeffrey and Devin, Matthieu and Ghemawat, Sanjay and Irving, Geoffrey and Isard, Michael and Kudlur, Manjunath and Levenberg, Josh and Monga, Rajat and Moore, Sherry and Murray, Derek G and Steiner, Benoit and Tucker, Paul and Vasudevan, Vijay and Warden, Pete and Wicke, Martin and Yu, Yuan and Zheng, Xiaoqiang and Brain, Google},
+booktitle = {12th USENIX Symposium on Operating Systems Design and Implementation (OSDI '16)},
+doi = {10.1038/nn.3331},
+isbn = {978-1-931971-33-1},
+issn = {0270-6474},
+pages = {265--284},
+pmid = {16411492},
+title = {{TensorFlow: A System for Large-Scale Machine Learning}},
+url = {https://www.usenix.org/conference/osdi16/technical-sessions/presentation/abadi},
+year = {2016}
+}
 
+@article{TextCNN,
+  author    = {Yoon Kim},
+  title     = {Convolutional Neural Networks for Sentence Classification},
+  journal   = {CoRR},
+  volume    = {abs/1408.5882},
+  year      = {2014},
+  url       = {http://arxiv.org/abs/1408.5882},
+  archivePrefix = {arXiv},
+  eprint    = {1408.5882},
+  timestamp = {Wed, 07 Jun 2017 14:40:07 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/corr/Kim14f},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
 
+@article{mozetivc2016multilingual,
+  title={Multilingual Twitter sentiment classification: The role of human annotators},
+  author={Mozeti{\v{c}}, Igor and Gr{\v{c}}ar, Miha and Smailovi{\'c}, Jasmina},
+  journal={PloS one},
+  volume={11},
+  number={5},
+  pages={e0155036},
+  year={2016},
+  publisher={Public Library of Science}
+}
 
-@Book{spolsky04software,
-  author = 	 {Joel Spolsky},
-  title = 		 {Joel on Software: And on Diverse \& Occasionally Related Matters That Will Prove of Interest etc..: And on Diverse and Occasionally Related Matters ... or Ill-Luck, Work with Them in Some Capacity},
-  publisher = 	 {APRESS},
-  year = 		 2004}
+@article{transformer,
+  author    = {Ashish Vaswani and
+               Noam Shazeer and
+               Niki Parmar and
+               Jakob Uszkoreit and
+               Llion Jones and
+               Aidan N. Gomez and
+               Lukasz Kaiser and
+               Illia Polosukhin},
+  title     = {Attention Is All You Need},
+  journal   = {CoRR},
+  volume    = {abs/1706.03762},
+  year      = {2017},
+  url       = {http://arxiv.org/abs/1706.03762},
+  archivePrefix = {arXiv},
+  eprint    = {1706.03762},
+  timestamp = {Mon, 03 Jul 2017 13:29:02 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/corr/VaswaniSPUJGKP17},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
 
-@Book{hunt99pragmatic,
-  author = 	 {Andrew Hunt and David Thomas},
-  title = 		 {The Pragmatic Programmer},
-  publisher = 	 {Addison Wesley},
-  year = 		 1999}
+@article{twitter_preprocessing,
+author = {Effrosynidis, Dimitrios and Symeonidis, Symeon and Arampatzis, Avi},
+year = {2017},
+month = {09},
+pages = {},
+title = {A Comparison of Pre-processing Techniques for Twitter Sentiment Analysis},
+booktitle = {21st International Conference on Theory and Practice of Digital Libraries (TPDL 2017)}
+}
 
+@incollection{CharTextCNN,
+title = {Character-level Convolutional Networks for Text Classification},
+author = {Zhang, Xiang and Zhao, Junbo and LeCun, Yann},
+booktitle = {Advances in Neural Information Processing Systems 28},
+editor = {C. Cortes and N. D. Lawrence and D. D. Lee and M. Sugiyama and R. Garnett},
+pages = {649--657},
+year = {2015},
+publisher = {Curran Associates, Inc.},
+url = {http://papers.nips.cc/paper/5782-character-level-convolutional-networks-for-text-classification.pdf}
+}
+
+@inproceedings{pennington2014glove,
+  author = {Jeffrey Pennington and Richard Socher and Christopher D. Manning},
+  booktitle = {Empirical Methods in Natural Language Processing (EMNLP)},
+  title = {GloVe: Global Vectors for Word Representation},
+  year = {2014},
+  pages = {1532--1543},
+  url = {http://www.aclweb.org/anthology/D14-1162},
+}
+
+@article{rnn,
+  title={Recurrent neural network for text classification with multi-task learning},
+  author={Liu, Pengfei and Qiu, Xipeng and Huang, Xuanjing},
+  journal={arXiv preprint arXiv:1605.05101},
+  year={2016}
+}
+
+@InProceedings{joulin2017bag,
+  title={Bag of Tricks for Efficient Text Classification},
+  author={Joulin, Armand and Grave, Edouard and Bojanowski, Piotr and Mikolov, Tomas},
+  booktitle={Proceedings of the 15th Conference of the European Chapter of the Association for Computational Linguistics: Volume 2, Short Papers},
+  month={April},
+  year={2017},
+  publisher={Association for Computational Linguistics},
+  pages={427--431},
+}
+
+@article{lstm,
+  title={Long short-term memory},
+  author={Hochreiter, Sepp and Schmidhuber, J{\"u}rgen},
+  journal={Neural computation},
+  volume={9},
+  number={8},
+  pages={1735--1780},
+  year={1997},
+  publisher={MIT Press}
+}
+
+@article{gru,
+  author    = {Kyunghyun Cho and
+               Bart van Merrienboer and
+               {\c{C}}aglar G{\"{u}}l{\c{c}}ehre and
+               Fethi Bougares and
+               Holger Schwenk and
+               Yoshua Bengio},
+  title     = {Learning Phrase Representations using {RNN} Encoder-Decoder for Statistical
+               Machine Translation},
+  journal   = {CoRR},
+  volume    = {abs/1406.1078},
+  year      = {2014},
+  url       = {http://arxiv.org/abs/1406.1078},
+  archivePrefix = {arXiv},
+  eprint    = {1406.1078},
+  timestamp = {Wed, 07 Jun 2017 14:43:08 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/corr/ChoMGBSB14},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{zeroshot,
+  author    = {Melvin Johnson and
+               Mike Schuster and
+               Quoc V. Le and
+               Maxim Krikun and
+               Yonghui Wu and
+               Zhifeng Chen and
+               Nikhil Thorat and
+               Fernanda B. Vi{\'{e}}gas and
+               Martin Wattenberg and
+               Greg Corrado and
+               Macduff Hughes and
+               Jeffrey Dean},
+  title     = {Google's Multilingual Neural Machine Translation System: Enabling
+               Zero-Shot Translation},
+  journal   = {CoRR},
+  volume    = {abs/1611.04558},
+  year      = {2016},
+  url       = {http://arxiv.org/abs/1611.04558},
+  archivePrefix = {arXiv},
+  eprint    = {1611.04558},
+  timestamp = {Wed, 07 Jun 2017 14:41:25 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/corr/JohnsonSLKWCTVW16},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@book{numpy,
+  title={A guide to NumPy},
+  author={Oliphant, Travis E},
+  volume={1},
+  year={2006}
+}
+
+@inproceedings{bahdanau,
+    title = {{End-to-End Attention-Based Large Vocabulary Speech Recognition}},
+    year = {2016},
+    booktitle = {2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+    author = {Bahdanau, Dzmitry and Chorowski, Jan and Serdyuk, Dmitriy and Brakel, Philémon and Bengio, Yoshua},
+    url = {https://arxiv.org/pdf/1508.04395.pdf},
+    keywords = {ASR, Index Terms— neural networks, LVCSR, attention, speech recognition}
+}
+
+@inproceedings{luong,
+    title = {{Effective Approaches to Attention-based Neural Machine Translation}},
+    year = {2015},
+    booktitle = {Proceedings of the 2015 Conference on Empirical Methods in Natural Language Processing},
+    author = {Luong, Minh-Thang and Pham, Hieu and Manning, Christopher D},
+    url = {https://arxiv.org/pdf/1508.04025.pdf},
+    arxivId = {arXiv:1508.04025v5},
+    keywords = {()}
+}
+
+@inproceedings{glorot2010understanding,
+  title={Understanding the difficulty of training deep feedforward neural networks},
+  author={Glorot, Xavier and Bengio, Yoshua},
+  booktitle={Proceedings of the thirteenth international conference on artificial intelligence and statistics},
+  pages={249--256},
+  year={2010}
+}
+
+@article{random-forests,
+ author = {Breiman, Leo},
+ title = {Random Forests},
+ journal = {Mach. Learn.},
+ issue_date = {October 1 2001},
+ volume = {45},
+ number = {1},
+ month = oct,
+ year = {2001},
+ issn = {0885-6125},
+ pages = {5--32},
+ numpages = {28},
+ url = {https://doi.org/10.1023/A:1010933404324},
+ doi = {10.1023/A:1010933404324},
+ acmid = {570182},
+ publisher = {Kluwer Academic Publishers},
+ address = {Hingham, MA, USA},
+ keywords = {classification, ensemble, regression},
+} 
+
+@article{tensor2tensor,
+  author    = {Ashish Vaswani and Samy Bengio and Eugene Brevdo and
+    Francois Chollet and Aidan N. Gomez and Stephan Gouws and Llion Jones and
+    \L{}ukasz Kaiser and Nal Kalchbrenner and Niki Parmar and Ryan Sepassi and
+    Noam Shazeer and Jakob Uszkoreit},
+  title     = {Tensor2Tensor for Neural Machine Translation},
+  journal   = {CoRR},
+  volume    = {abs/1803.07416},
+  year      = {2018},
+  url       = {http://arxiv.org/abs/1803.07416},
+}
+
+@article{scikit-learn,
+ title={Scikit-learn: Machine Learning in {P}ython},
+ author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+ journal={Journal of Machine Learning Research},
+ volume={12},
+ pages={2825--2830},
+ year={2011}
+}

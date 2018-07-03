@@ -11,27 +11,12 @@
 \usepackage{multirow}
 
 \newcommand{\TODO}[1]{\{\textbf{TODO: }\textcolor{red}{#1}\}}
+\usepackage{pdfpages}
+
+\IEEEoverridecommandlockouts %Enables \thanks to be used again
 
 \begin{document}
-\title{Computational Intelligence Lab: Text Sentiment Classification}
-
-% \author{
-%   Lukas Jendele$^\ast$\\
-%   \texttt{jendelel@ethz.ch}\\
-%   ETH Z\"{u}rich
-% \and
-%   Larissa Laich$^\ast$\\
-%   \texttt{llaich@ethz.ch}\\
-%   ETH Z\"{u}rich
-% \and
-%   Ondrej Skopek$^\ast$\\
-%   \texttt{oskopek@ethz.ch}\\
-%   ETH Z\"{u}rich
-% \and
-%   Michael Wiegner$^\ast$\\
-%   \texttt{wiegnerm@ethz.ch}\\
-%   ETH Z\"{u}rich
-% }
+\title{Computational Intelligence Lab: Tweet Sentiment Classification}
 
 \author{
   Luk\'{a}\v{s} Jendele$^\ast$\\
@@ -46,393 +31,226 @@
   ETH Z\"{u}rich\\
   \texttt{oskopek@ethz.ch}\\
   \and
-  Micheal Wiegner\thanks{All authors contributed equally.}\TODO{Thanks}\\
+  Michael Wiegner$^\ast$\thanks{$^\ast$ All authors contributed equally.}\\
   ETH Z\"{u}rich\\
   \texttt{wiegnerm@ethz.ch}\\
 }
 
-
-\maketitle
+\maketitle%
 
 \begin{abstract}
-\TODO{Abstract}
+Sentiment analysis is a key stepping stone on the path to natural language understanding. In this paper, we show that deep neural networks can learn to classify sentiment even on very short and noisy texts without any preprocessing, by evaluating our models on the Twitter dataset and obtaining competitive results (88.5\% test set accuracy). We investigated the performance of different models Recurrent and Convolutional Neural Network based models on the binary sentiment classification problem and compared all our approaches to simpler baselines.
 \end{abstract}
 
 \section{Introduction}
-The aim of writing a paper is to infect the mind of your reader with
-the brilliance of your idea~\cite{jones08}. 
-The hope is that after reading your
-paper, the audience will be convinced to try out your idea. In other
-words, it is the medium to transport the idea from your head to your
-reader's head. 
-In the following
-section, we show a common structure of scientific papers and briefly
-outline some tips for writing good papers in
-Section~\ref{sec:tips-writing}.
+With the rise of Internet technologies, micro-blogging sites like Twitter have became increasingly popular to share and discuss information and express personal opinions. Used by millions of people on a daily basis, Twitter has become a source of data and offers huge opportunities for analysis. One of many applications is for example market analysis: how users perceive certain companies' products. Due to the large amount of data, reliable automated sentiment analysis is essential to be able to process and extract information from it efficiently. Recent developments in machine learning, like deep neural networks have shown promising results when performing sentiment analysis. However, there is still room for improvement, which is what we want to investigate in this paper. In our task, we classify tweets based on positive or negative sentiment.
 
-At that
-point, it is important that the reader is able to reproduce your
-work~\cite{schwab00,wavelab,gentleman05}. This is why it is also
-important that if the work has a computational component, the software
-associated with producing the results are also made available in a
-useful form. Several guidelines for making your user's experience with
-your software as painless as possible is given in
-Section~\ref{sec:tips-software}.
+Tweets are short messages on Twitter which were originally limited to a length of 140 characters. Due to this length limitation and the fact that it is a fast-paced micro-blogging platform, most people use abbreviations, emoticons, hashtags, or ``@username'' to refer to other users. The dataset is therefore relatively structured and allows us to determine sentiment by checking emoticons occuring in tweets. Tweets with a ``:)'' smiley are considered to be positive tweets while negative tweets contain a ``:('' smiley. This allows us to label the data automatically as the smilies are removed from the training data and used as a label. Determining tweet sentiment simply based on an emoticon contained in the tweet introduces some noise to the labels, as there sometimes is not a direct correlation between sentiment and smiley (e.g.~irony, sarcasm, etc.). On the other hand, the use of colloquial language makes this task different from analyzing text from books or articles, and reflects the rough real world conditions of language use. 
 
-Finally, we describe the rules for submission in the computational
-intelligence laboratory in Section~\ref{sec:cil}. 
-This brief guide is by no means sufficient, on its own, to
-make its reader an accomplished writer. The reader is urged to use the
-references to further improve his or her writing skills.
-
-\section{The Structure of a Paper}
-\label{sec:structure-paper}
-
-Scientific papers usually begin with the description of the problem,
-justifying why the problem is interesting. Most importantly, it argues
-that the problem is still unsolved, or that the current solutions are
-unsatisfactory. This leads to the main gist of the paper, which is
-``the idea''. The authors then show evidence, using derivations or
-experiments, that the idea works. Since science does not occur in a
-vacuum, a proper comparison to the current state of the art is often
-part of the results. Following these ideas, papers usually have the
-following structure:
-\begin{description}
-\item[Abstract] \ \\
-  Short description of the whole paper, to help the
-  reader decide whether to read it.
-\item[Introduction] \ \\
-  Describe your problem and state your
-  contributions.
-\item[Models and Methods] \ \\
-  Describe your idea and how it was implemented to solve
-  the problem. Survey the related work, giving credit where credit is
-  due.
-\item[Results] \ \\
-  Show evidence to support your claims made in the
-  introduction.
-\item[Discussion] \ \\
-  Discuss the strengths and weaknesses of your
-  approach, based on the results. Point out the implications of your
-  novel idea on the application concerned.
-\item[Summary] \ \\
-  Summarize your contributions in light of the new
-  results.
-\end{description}
-
-
-\section{Tips for Good Writing}
-\label{sec:tips-writing}
-
-The ideas for good writing have come
-from~\cite{editor10,jones08,anderson04}.
-
-\subsection{Getting Help}
-One should try to get a draft read by as many friendly people as
-possible. And remember to treat your test readers with respect. If
-they are unable to understand something in your paper, then it is
-highly likely that your reviewers will not understand it
-either. Therefore, do not be defensive about the criticisms you get,
-but use it as an opportunity to improve the paper. Before your submit
-your friends to the pain of reading your draft, please \emph{use a
-  spell checker}.
-
-\subsection{Abstract}
-The abstract should really be written last, along with the title of
-the paper. The four points that should be covered~\cite{jones08}:
+For this project, we designed and implemented multiple machine learning models for sentiment analysis. The results are evaluated based on classification accuracy.
+Our contributions are the following:
 \begin{enumerate}
-\item State the problem.
-\item Say why it is an interesting problem.
-\item Say what your solution achieves.
-\item Say what follows from your solution.
+\item Improved accuracy from the best baseline models by approximately 7\%.
+\item By using ensembles, improved performance by another 0.5\%.
+\item Achieved 3\textsuperscript{rd} best result on both public and private Kaggle test datasets.
 \end{enumerate}
 
-\subsection{Figures and Tables}
+\section{Related work}
+Sentiment analysis is one the most basic text classification tasks, and therefore, has been a subject of interest to many researchers \cite{TextCNN,mozetivc2016multilingual,transformer,twitter_preprocessing,CharTextCNN}. While part of the research focused on data preprocessing \cite{twitter_preprocessing}, others were more concerned with the classification model itself \cite{TextCNN}.
 
-% \begin{figure}[tbp]
-%   \centering
-%   \includegraphics[width=\columnwidth]{denoised_signal_1d}
-%   \caption{Signal compression and denoising using the Fourier basis.}
-%   \label{fig:denoise-fourier}
-% \end{figure}
-% \begin{figure}[htbp]
-%   \centering
-%   \includegraphics[width=\columnwidth]{local_wdenoised_1d}
-%   \caption{Signal compression and denoising using the Daubechies wavelet basis.}
-%   \label{fig:denoise-wavelet}
-% \end{figure}
+Before deep learning models, researchers extracted features from the text and ran a binary classifier on these features \TODO{Find paper that does this.}. Another simple approach was to sum or average learned word embeddings and classify them with standard machine learning algorithms, as recommended in the CIL course tutorial.
 
-Use examples and illustrations to clarify ideas and results. For
-example, by comparing Figure~\ref{fig:denoise-fourier} and
-Figure~\ref{fig:denoise-wavelet}, we can see the two different
-situations where Fourier and wavelet basis perform well. 
+With the recent success of deep neural networks in natural language processing problems, researchers tackled sentiment analysis by applying various convolutional \cite{TextCNN} and recurrent neural networks \cite{rnn} to the task. 
 
-\subsection{Models and Methods}
-The models and methods
-section should describe what was
-done to answer the research question, describe how it was done,
-justify the experimental design, and
-explain how the results were analyzed.
+In our approach, we implemented both classical, as well as modern neural network approaches, apply them to sentiment analysis and compare them with each other.
 
-The model refers to the underlying mathematical model or structure which 
-you use to describe your problem, or that your solution is based on. 
-The methods on the other hand, are the algorithms used to solve the problem. 
-In some cases, the suggested method directly solves the problem, without having it 
-stated in terms of an underlying model. Generally though it is a better practice to have 
-the model figured out and stated clearly, rather than presenting a method without specifying 
-the model. In this case, the method can be more easily evaluated in the task of fitting 
-the given data to the underlying model.
+\section{Models and Methods}
 
-The methods part of this section, is not a step-by-step, directive,
-protocol as you might see in your lab manual, but detailed enough such
-that an interested reader can reproduce your
-work~\cite{anderson04,wavelab}.
+We use several different approaches to classify sentiment. In this section, we briefly describe each model and explain our motivation for its usage.
 
-The methods section of a research paper provides the information by
-which a study's validity is judged.
-Therefore, it requires a clear and precise description of how an
-experiment was done, and the rationale
-for why specific experimental procedures were chosen.
-It is usually helpful to
-structure the methods section by~\cite{kallet04methods}:
-\begin{enumerate}
-\item Layout the model you used to describe the problem or the solution.
-\item Describing the algorithms used in the study, briefly including
-  details such as hyperparameter values (e.g. thresholds), and
-  preprocessing steps (e.g. normalizing the data to have mean value of
-  zero).
-\item Explaining how the materials were prepared, for example the
-  images used and their resolution.
-\item Describing the research protocol, for example which examples
-  were used for estimating the parameters (training) and which were
-  used for computing performance.
-\item Explaining how measurements were made and what
-  calculations were performed. Do not reproduce the full source code in
-  the paper, but explain the key steps.
-\end{enumerate}
+\begin{figure}
+\includegraphics[width=0.48\textwidth]{./rnn}
+\caption{Sketch of our recurrent neural network architecture LSTM128. Equal colors indicate shared weights. $x\_$ represent individual character embeddings, $w\_$ represent word embeddings, and $ce\_$ represent character-based word embeddings.}
+\label{fig:arch}
+\end{figure}
 
-\subsection{Results}
+\subsection{Baselines}
+%In order to compare our models, we implemented three baselines.
 
-Organize the results section based on the sequence of table and
-figures you include. Prepare the tables and figures as soon as all
-the data are analyzed and arrange them in the sequence that best
-presents your findings in a logical way. A good strategy is to note,
-on a draft of each table or figure, the one or two key results you
-want to address in the text portion of the results.
-The information from the figures is
-summarized in Table~\ref{tab:fourier-wavelet}.
+\subsubsection{Glove + Logistic regression}
+This baseline is taken from the CIL lecture. We use GloVe word embeddings \cite{pennington2014glove} and average them for each tweet. On the resulting vector, we apply logistic regression. For this baseline, we either compute the Glove embeddings based on our training data by using scripts from the CIL tutorial, or use precomputed ones from Stanford University\footnote{\url{https://nlp.stanford.edu/projects/glove/}}.
+Both variants of the embeddings have 200 dimensions.
 
-\begin{table*}[htbp]
-  \centering
-  \begin{tabular}[c]{|l||l|l|l|}
-    \hline
-    Basis&Support&Suitable signals&Unsuitable signals\\
-    \hline
-    Fourier&global&sine like&localized\\
-    wavelet&local&localized&sine like\\
-    \hline
-  \end{tabular}
-  \caption{Characteristics of Fourier and wavelet basis.}
-  \label{tab:fourier-wavelet}
-\end{table*}
+\subsubsection{Glove + Random Forest}
+Similarly to the previous baseline, we average the GloVe word embeddings for each tweet. However, this time we use a Random Forest (RF) classifier \cite{random-forests} with 128 trees. We report scores for evaluation using both the self trained and Stanford pre-trained Glove embeddings. The same dimensionality as above was used.
 
-When reporting computational or measurement results, always
-report the mean (average value) along with a measure of variability
-(standard deviation(s) or standard error of the mean).
+\subsubsection{FastText}
+FastText \cite{joulin2017bag} is a command-line tool developed by Facebook AI Research. As it is simple to set up and runs fast, we decided to run it on our dataset and consider it as one of the baselines. In one step, it learns word embeddings in an unsupervised way, and trains a simple classifier on them. 
+
+\subsection{Common preprocessing}
+For our RNN and CNN models, we apply a common loading and preprocessing step. As the input data is already lowercased and spaces are normalized, we only apply a vocabulary downsize and padding step for computational reasons.
+We only add the 20 000 most common words (in the training data) to our vocabulary. All other words are mapped to an UNK token. Moreover, we clip tweets at 40 words (only very few tweets are longer than that).
+
+We also experimented with more heavy preprocessing similar to \cite{twitter_preprocessing}, but did not manage to achieve significant improvements in performance compared to the un-preprocessed variant of our models.
+
+\subsection{RNN models}
+Recurrent neural networks are one of the most used network architectures for natural language processing tasks such as machine translation, language modeling, and text classification.
+
+Our model architecture is depicted in Figure~\ref{fig:arch}. First, we run a bi-directional RNN on each of the tweet words' embedded characters. We concatenate the final hidden states with randomly initialized whole-word embeddings, and use the concatenated vectors as the final word embeddings for the next layer. Another bi-directional RNN network is run on the final word embeddings and its hidden states are fed into two 256-unit fully connected layers with ReLU activation functions. Finally, we append a fully connected layer with Softmax that classifies into positive and negative labels,
+and train the network using a cross-entropy loss function. 
+
+We use only two RNN cells with dimensionality of the hidden state(s) 128, one for the character RNN and one for the word RNN. A single cell is used for both directions. Our character and word embeddings have a dimensionality 200. 
+
+We also briefly experimented with both Luong \cite{luong} and Bahdanau \cite{bahdanau} attention, but only observed higher training times and equivalent performance to models without attention.
+
+The performance of the model depends largely on the recurrent cell. Thus, we ran the described architecture with minor changes (each described below) and report the performance.
+
+\subsubsection{LSTM128}
+Long-Short-Term-Memory \cite{lstm} cells are the most frequently used recurrent units used to process text. They are well-known for their ability to capture long-range contextual features in text. In our implementation, the cell has a dimensionality 128, and we concatenate both the cell and hidden states of the final cell before passing them to the fully-connected layers.
+
+\subsubsection{GRU256}
+Gated Recurrent Unit \cite{gru} has proven to be the best compromise of learning capabilities and computational complexity. It contains less gating (only one hidden state) than the more popular and older LSTM cell. Therefore, we ran an experiment in which we replaced the LSTM cell with a GRU cell of dimensionality 256.
+
+\subsubsection{LSTM128 without character embeddings}
+In this experiment, we removed the first RNN network. That way, we completely ignore word morphology, but acquire a significantly simpler model.
+
+\subsubsection{LSTM128 without word embeddings}
+Conversely, we only use the character based part computed by the first RNN here. This enforces a more hierarchical and end-to-end learned model.
+
+\subsubsection{Stacked LSTM}
+To increase the model capacity (its power to learn), we stack multiple LSTM cells on top of each other, which is a common practice in machine translation models \cite{zeroshot}. For our purposes, we use two LSTMs, with dropout 0.5 \cite{dropout1,dropout2} on all individual LSTM cell inputs and outputs.
 
 
-\section{Tips for Good Software}
-\label{sec:tips-software}
+\subsection{Other models}
 
-There is a lot of literature (for example~\cite{hunt99pragmatic} and
-\cite{spolsky04software}) on how to write software. It is not the
-intention of this section to replace software engineering
-courses. However, in the interests of reproducible
-research~\cite{schwab00}, there are a few guidelines to make your
-reader happy:
-\begin{itemize}
-\item Have a \texttt{README} file that (at least) describes what your
-  software does, and which commands to run to obtain results. Also
-  mention anything special that needs to be set up, such as
-  toolboxes\footnote{For those who are
-  particularly interested, other common structures can be found at
-  \url{http://en.wikipedia.org/wiki/README} and
-  \url{http://www.gnu.org/software/womb/gnits/}.}.
-\item A list of authors and contributors can be included in a file
-  called \texttt{AUTHORS}, acknowledging any help that you may have
-  obtained. For small projects, this information is often also
-  included in the \texttt{README}.
-\item Use meaningful filenames, and not \texttt{temp1.m},
-  \texttt{temp2.m}. The code should also unzip into a subdirectory.
-\item Document your code. Each file should at least have a short
-  description about its reason for existence. Non obvious steps in the
-  code should be commented.
-\item Describe how the results presented in your paper can potentially
-  be reproduced.
-\end{itemize}
+\subsubsection{TextCNN}
+Recurrent neural networks are well known for their capabilities to capture long context. However, tweets are very short and therefore a limited fixed receptive field is most likely capable of learning the text sentiment. Thus, we replaced the word RNN with convolutions similar to \cite{TextCNN}. We used kernel sizes 3, 4, 5, and 7, each with 512 channels.
+
+\subsubsection{Transformer Tiny}
+Transformer \cite{transformer} is a state of the art method in machine translation. It uses gating similar to RNN cells, while processing tokens in parallel similar to CNNs. We utilized the Tensor2Tensor \cite{tensor2tensor} implementation, and trained the ``tiny'' version (2 hidden layers) of the model's encoder for classification.
+
+\subsubsection{Ensemble Majority Vote}
+Motivated by most data science competitions, an ensemble of several strong models usually yields to better performance. Thus, to lower the prediction variance, we combined the test predictions of several different approaches using majority voting: LSTM128, Stanford GloVe+RF, Transformer, Stacked LSTM, and CNN. We decided to select five models as an odd number always leads to a majority vote for one of the two labels. Additionally, a single model still has some weight when we choose a relatively small number of models.
+
+\subsection{Implementation}
+All neural network models are implemented in TensorFlow \cite{tensorflow}, and trained with the Adam optimizer \cite{adam} with a learning rate of $3 \cdot 10^{-4}$. All variables were initialized with Glorot initialization \cite{glorot2010understanding}.
+The GloVe embedding implementation was adapted from the coding exercise solution to CIL tutorial 6. When training GloVe embeddings, we train for 20 epochs. For the Random Forests and Logistic Regression, we used the NumPy \cite{numpy} and scikit-learn \cite{scikit-learn} Python libraries.
+For FastText and Transformer, we used the original implementations available online\footnote{\url{https://fasttext.cc/}, \url{https://github.com/tensorflow/tensor2tensor}}.
+The ensemble majority voting was done in a simple spreadsheet.
+
+All code is available in the repository\footnote{\url{https://github.com/oskopek/cil}} and is also attached to our paper submission.
 
 
-\section{Computational Intelligence Laboratory Requirements}
-\label{sec:cil}
+\section{Experiments}
+To achieve reproducible results, we trained all experiments with the same fixed random seed. Moreover, we split the data into a training and evaluation set which we used for all the experiments.
+The evaluation set contained 100 000 tweets, and the remaining 2.4 million tweets were used for training.
 
-Your semester project is a group effort. It consists of four parts:
-\begin{enumerate}
-\item The programming assignments you solve during the semester.
-\item Developing a novel solution for one of the assignments, e.g. by
-  combining methods from previous programming assignments into a novel
-  solution.
-\item Comparing your novel solution to previous assignments.
-\item Writing up your findings in a short scientific paper.
-\end{enumerate}
+All neural network experiments were trained on the Leonhard ETHZ cluster on Nvidia GeForce GTX 1080 Ti.
+All of these experiments ran for a maximum of 24 hours, 15 epochs,
+with batch size 32.
+We evaluated on the full evaluation set every 7500 steps (independent on the batch size), and as the final predictions, used the ones that were created at the point where the model had the highest evaluation accuracy.
+Most models obtained best results around epochs 9--12, which corresponds
+to about 21 hours in training time.
 
-\subsection{Developing a Novel Solution}
+The Stacked LSTM ran with batch size 256 for about 12 hours.
+The Transformer \TODO{Lukas finish this}. All baselines
+ran for a very short time on commodity CPU hardware.
+Due to the instability of FastText with respect to the random seed,
+we perform 5 runs, and report the standard deviations. 
+  
+\section{Results}
 
-As your final programming assignment, you develop a novel solution to
-one of the four application problems. You are free to exploit any idea
-you have, provided it is not identical to any other group submission
-or existing Matlab implementation of an algorithm on the
-internet\footnote{\url{http://www.ethz.ch/students/semester/plagiarism_s_en.pdf}}.
+\begin{table}\centering
+\begin{tabular}{lrrr}
+\toprule
+\multirow{2}{*}{Model} & \multicolumn{1}{c}{Evaluation} & \multicolumn{1}{c}{Test (public)} & \multicolumn{1}{c}{Test (private)}\\
+& Acc.~\% & Acc.~\% & Acc.~\%\\
+\midrule
+GloVe + LR & 61.69 & 61.56 & 62.10\\
+Stanford GloVe + LR & 78.08 & 77.06 & 76.94\\
+GloVe + RF & 71.00 & 67.84 & 69.04\\
+Stanford GloVe + RF & 79.97 & 77.00 & 77.94\\
+FastText \cite{joulin2017bag} & \textbf{81.31} \textbf{$\pm$ 2.21} & \textbf{80.88 $\pm$ 2.03}& \textbf{80.50 $\pm$ 1.57}\\
+\midrule
+knilpt &  & \textbf{89.08} & 88.48\\
+Satisfaction &  & 88.78 & \textbf{88.62}\\
+\midrule
+LSTM128 & 88.49 & 87.90 & 87.82\\
+GRU256 & 88.45 & 87.66 & 87.52\\
+LSTM128 w/o WE & ? & ? & ?\\
+LSTM128 w/o CE & 88.18 & 87.82 & \textbf{87.90}\\
+StackLSTM & \textbf{88.58} & 88.06 & 87.68\\
+TextCNN & 87.71 & 87.70 & 87.10\\
+Transformer Tiny & 86.00 & 85.34 & 83.84\\
+Ensemble Majority Vote & & \textbf{88.54} & 87.78\\
+\bottomrule
+\end{tabular}
+\caption{Evaluation and test set results. Values left blank are unknown. Acc.~means accuracy, LR~is logistic regression, WE/CE are word/character embeddings respectively, and RF denotes a Random Forest. The top section describes baselines that we ran on our data split. Middle section contains the two top teams on Kaggle for this project. Bottom section shows our results. Values that have confidence intervals were unstable enough to be have to be run 5 times.}\label{tab:results}
+\end{table}
 
-Two examples for developing a novel solution:
-\begin{itemize}
-\item You implemented a collaborative filtering algorithm based on
-  dimension reduction as part of an assignment. Now you apply
-  dimension reduction to inpainting.
-\item You implemented both a clustering and a sparse coding algorithm
-  for image compression. Now you combine both techniques into a novel
-  compression method.
-\end{itemize}
+The results of all our experiments are summarized in Table~\ref{tab:results}. The reported evaluation accuracy is the best one obtained during training (and hence the version of the model with which we submitted the predictions to Kaggle). The public and private test scores correspond to the scores those submissions obtained on the Kaggle data splits. The values left blank are unknown.
 
-\subsection{Comparison to Baselines}
+In Table~\ref{tab:params}, we present the number of parameters for our models (including the learned embeddings).
 
-You compare your novel algorithm to \emph{at least two baseline
-  algorithms}. For the baselines, you can use the implementations you
-developed as part of the programming assignments.
+\begin{table}\centering
+\begin{tabular}{lr}
+\toprule
+Model & Parameters\\
+\midrule
+LSTM128 & ?\\
+GRU256 & ?\\
+LSTM128 w/o WE & ?\\
+LSTM128 w/o CE & ?\\
+StackLSTM & ?\\
+TextCNN & ?\\
+Transformer Tiny & \TODO{Lukas}\\
+Ensemble Majority Vote & ?SUM?\\
+\bottomrule
+\end{tabular}
+\caption{Number of parameters of our models.}\label{tab:params}
+\end{table}
 
+\section{Discussion}
 
-\subsection{Write Up}
+We can observe that all our models perform consistently better than all baselines, and most also perform better than the best submissions of all teams below us on the Kaggle leaderboard.
 
-The submission must be in PDF form, using the \LaTeX{} template
-corresponding to the IEEE style of publication. Refer to
-Section~\ref{sec:latex-primer} for more information about preparing
-your document. The document should be a maximum of {\bf 4 pages}.
+An interesting observation is that some models generalize to the test set better than others. For example, the accuracy of TextCNN only drops marginally on the test sets compared to the evaluation set, as opposed to all our RNN models. Generally, we observe that the simpler the model, the better it generalizes (among neural models, e.g.~LSTM128 w/o WE, LSTM128 w/o CE).
 
-\subsection{\LaTeX{} Primer}
-\label{sec:latex-primer}
+As can be seen in Table~\ref{tab:params},
+the number of parameters in a model has limited effect on its performance. We can see that above a model complexity, adding more parameters only helps marginally.
+\TODO{(oskopek): Describe/fix/make more concrete the description of model perf based on number of params.}
 
-\LaTeX{} is one of the most commonly used document preparation systems
-for scientific journals and conferences. It is based on the idea
-that authors should be able to focus on the content of what they are
-writing without being distracted by its visual presentation.
-The source of this file can be used as a starting point for how to use
-the different commands in \LaTeX{}. We are using an IEEE style for
-this course.
-
-\subsubsection{Installation}
-
-There are various different packages available for processing \LaTeX{}
-documents.
-On Windows, use the Mik\TeX{} package (\url{http://miktex.org/}), and
-on OSX use MacTeX
-(\url{http://www.tug.org/mactex/2009/}). Alternatively, on OSX, you
-can install the \texttt{tetex} package via
-Fink\footnote{\url{http://www.finkproject.org/}} or 
-Macports\footnote{\url{http://www.macports.org/}}.
-
-\subsubsection{Compiling \LaTeX{}}
-Your directory should contain at least 4 files, in addition to image
-files. Images should be in \texttt{.png}, \texttt{.jpg} or
-\texttt{.pdf} format.
-\begin{itemize}
-\item IEEEtran.cls
-\item IEEEtran.bst
-\item groupXX-submission.tex
-\item groupXX-literature.bib
-\end{itemize}
-Note that you should replace groupXX with your chosen group name.
-Then, from the command line, type:
-\begin{verbatim}
-$ pdflatex groupXX-submission
-$ bibtex groupXX-literature
-$ pdflatex groupXX-submission
-$ pdflatex groupXX-submission
-\end{verbatim}
-This should give you a PDF document \texttt{groupXX-submission.pdf}.
-
-\subsubsection{Equations}
-
-There are three types of equations available: inline equations, for
-example $y=mx + c$, which appear in the text, unnumbered equations
-$$y=mx + c,$$
-which are presented on a line on its own, and numbered equations
-\begin{equation}
-  \label{eq:linear}
-  y = mx + c
-\end{equation}
-which you can refer to at a later point (Equation~(\ref{eq:linear})).
-
-\subsubsection{Tables and Figures}
-
-Tables and figures are ``floating'' objects, which means that the text
-can flow around it.
-Note
-that \texttt{figure*} and \texttt{table*} cause the corresponding
-figure or table to span both columns.
+\begin{table}\centering
+\includegraphics[width=0.48\textwidth]{./ensemble_tablev2}
+\caption{Pairwise label agreement between the various models used in the ensemble on the test set. Note that the table is symmetric.}\label{tab:agreement}
+\end{table}
 
 
-\subsection{Grading}
 
-There are two different types of grading criteria applied to your
-project, with the corresponding weights shown in brackets.
-\begin{description}
-\item[Competitive] \ \\
-  The following criteria is scored based on your rank
-  in comparison with the rest of the class.
-  \begin{itemize}
-  \item time taken for computation (10\%)
-  \item average rank for all other criteria relevant to the task, for
-    example reconstruction error and sparsity (20\%)
-  \end{itemize}
-  The ranks will then be converted on a linear scale into a grade
-  between 4 and 6.
-\item[Non-competitive] \ \\
-  The following criteria is scored based on an
-  evaluation by the teaching assistants.
-  \begin{itemize}
-  \item quality of paper (30\%)
-  \item quality of implementation (20\%)
-  \item creativity of solution (20\%)
-  \end{itemize}
-\end{description}
+An interesting comparison of how surprisingly diverse the models we trained are 
+can be seen in Table~\ref{tab:agreement}. Interestingly, our well  performing models (LSTM128, CNN512, and StackLSTM) only agree with each other in about 94\% of the cases (pairwise).
+We can also see the effects of lower performance of the Transformer and GloVe+RF models on the pairwise agreement with other models. 
+\TODO{Expand this if we add FastText and GRU256, might be interesting to compare them to Glove and LSTM, respectively.}
 
-\subsection{Submission System}
+\begin{figure}\centering
+\includegraphics[width=0.5\textwidth]{./ensemble_diag}
+\caption{Bar plot of the number of models that ended up voting for the final majority result.}\label{fig:diag}
+\end{figure}
 
-The deadline for submitting your project report is Friday, 22 June
-2012.
-You need to submit:
-\begin{itemize}
-\item PDF of paper.
-\item Archive (\texttt{.tar.gz} or \texttt{.zip}) of software. Please
-  do not forget to include author information in the source archive.
-\end{itemize}
-
-\textbf{Important:} Please check the submission instructions on the webpage 
-as it is the most updated instructions. 
+Our ensemble model leverages this diversity. The majority voting results are summarized in Figure~\ref{fig:diag}. We can see that in a total of about 26.5\% of the cases, at least one model was unsure about the chosen prediction.
 
 \section{Summary}
+To summarize, we have presented several approaches that perform competitively on the task of Twitter sentiment classification.
+They consistently outperform the baselines, behave in a stable fashion during training, are simple to implement, and need almost no preprocessing (on top of the already provided and processed data).
 
-The aim of a scientific paper is to convey the idea or discovery of
-the researcher to the minds of the readers. The associated software
-package provides the relevant details, which are often only briefly
-explained in the paper, such that the research can be reproduced.
-To write good papers, identify your key idea, make your contributions
-explicit, and use examples and illustrations to describe the problems
-and solutions.
+We have also shown that the models are diverse, and combining them in an ensemble reduces prediction variance and thus improves generalization.
 
 \section*{Acknowledgements}
-The author thanks Christian Sigg for his careful reading and helpful
-suggestions.
+
+We would like to thank the Data Analytics Lab and ETH~Z\"{u}rich for computational resources for this project on the Leonhard cluster, and answering all our questions on Piazza or otherwise.
 
 \bibliographystyle{IEEEtran}
 \bibliography{report}
+
+\include{decl}
 \end{document}
