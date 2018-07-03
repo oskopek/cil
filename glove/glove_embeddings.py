@@ -100,10 +100,18 @@ def main():
     if (len(sys.argv) <= 1):
         use_stanford = True
         use_logistic_regression = False
-        output_file_name = 'results_stanford.csv'
+        output_file_name = 'results_stanford_random_forests.csv'
     elif(len(sys.argv) == 3):
         use_logistic_regression = str_to_bool(sys.argv[1])
         use_stanford = str_to_bool(sys.argv[2])
+        output_file_name = 'results_'
+        if(use_stanford):
+            output_file_name += 'stanford_'
+        if(use_logistic_regression):
+            output_file_name += 'logistic_regression.csv'
+        elif:
+            output_file_name += 'random_forests.csv'
+
 
     if compute_embedding and not use_stanford:
         print('Compute and save embeddings')
