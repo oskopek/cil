@@ -21,4 +21,4 @@ with open(test_file, 'r') as f:
         print('Id,Prediction', file=w)
         for i, line in enumerate(f.readlines()):
             label = 2 * int(line.strip()[-1]) - 1
-            print('{},{}'.format(i+1, label), file=w)
+            print('{},{}'.format(i + 1, label), file=w)

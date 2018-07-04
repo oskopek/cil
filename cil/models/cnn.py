@@ -9,11 +9,7 @@ from .rnn import RNN
 class CNN(RNN):
     CLASSES = 2
 
-    def __init__(self,
-                 *args,
-                 num_channels: int = 512,
-                 expname: str = "exp",
-                 **kwargs) -> None:
+    def __init__(self, *args, num_channels: int = 512, expname: str = "exp", **kwargs) -> None:
         self.num_channels = num_channels
         super().__init__(*args, expname=f"CNN{num_channels}-{expname}", **kwargs)
 
@@ -96,4 +92,3 @@ class CNN(RNN):
                     clipped_gradients, global_step=self.global_step)
 
         return predictions, loss, training_step
-

@@ -37,7 +37,9 @@ class Model:
         self.is_training = tf.placeholder_with_default(False, [], name="is_training")
 
         if hasattr(self, 'keep_prob'):
-            self.keep_prob_cond = tf.cond(self.is_training, lambda: tf.constant(self.keep_prob, dtype=tf.float32), lambda: tf.constant(1.0, dtype=tf.float32))
+            self.keep_prob_cond = tf.cond(self.is_training,
+                                          lambda: tf.constant(self.keep_prob, dtype=tf.float32),
+                                          lambda: tf.constant(1.0, dtype=tf.float32))
 
         self.placeholder_tensors = [
             self.sentence_lens, self.word_ids, self.charseq_ids, self.charseqs, self.charseq_lens,
@@ -180,8 +182,8 @@ class Model:
         step = 0
         with tqdm.tqdm(range(epochs), desc="Epochs") as epoch_tqdm:
             for epoch in epoch_tqdm:
-                batch_count, batch_generator = data.train.batches_per_epoch(batch_size,
-                    shuffle=True)
+                batch_count, batch_generator = data.train.batches_per_epoch(
+                    batch_size, shuffle=True)
                 with tqdm.tqdm(range(batch_count), desc=f"Batches [Epoch {epoch}]") as batch_tqdm:
                     for _ in batch_tqdm:
                         batch = next(batch_generator)

@@ -10,4 +10,3 @@ for dataset in ["train", "eval", "test"]:
     with open("fasttext_{}_data.txt".format(dataset), "w") as f:
         for line in lines:
             print(line, file=f)
-

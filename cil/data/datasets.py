@@ -54,7 +54,7 @@ class Datasets:
         X_test, _ = Datasets._read_lines(self.test_file, quote=None)
         print(X_train[0], y_train[0])
         print(X_eval[0], y_eval[0])
-        print(X_test[0]) # TODO: Debug
+        print(X_test[0])  # TODO: Debug
 
         print("Preprocessing...")
         X_train, y_train = self.preprocessing.transform(X_train, labels=y_train)

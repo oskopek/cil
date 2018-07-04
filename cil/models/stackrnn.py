@@ -33,7 +33,8 @@ class StackRNN(Model):
 
         # Call super last, because our build_model method probably
         # needs above initialization to happen first
-        expname = f"{n_cells}xStack{rnn_cell}{rnn_cell_dim}-char{char_embedding}-word{word_embedding}-{expname}"
+        expname = f"char{char_embedding}-word{word_embedding}-{expname}"
+        expname = f"{n_cells}xStack{rnn_cell}{rnn_cell_dim}-{expname}"
         super().__init__(*args, expname=expname, **kwargs)
 
     def _create_cell(self, rnn_cell_dim) -> tf.nn.rnn_cell.RNNCell:
@@ -43,7 +44,8 @@ class StackRNN(Model):
             cell = tf.nn.rnn_cell.GRUCell(rnn_cell_dim)
         else:
             raise ValueError(f"Unknown rnn_cell {self.rnn_cell}. Possible values: LSTM, GRU.")
-        cell = tf.nn.rnn_cell.DropoutWrapper(cell, input_keep_prob=self.keep_prob_cond, output_keep_prob=self.keep_prob_cond)
+        cell = tf.nn.rnn_cell.DropoutWrapper(
+            cell, input_keep_prob=self.keep_prob_cond, output_keep_prob=self.keep_prob_cond)
         return cell
 
     def _char_embeddings(self):
@@ -91,7 +93,10 @@ class StackRNN(Model):
 
     def _create_sentence_cell(self):
         coef = 2 if self.rnn_cell == "LSTM" else 1
-        cells = [self._create_cell(self.word_embedding + 2*coef*self.char_embedding) for _ in range(self.n_cells)]
+        cells = [
+            self._create_cell(self.word_embedding + 2 * coef * self.char_embedding)
+            for _ in range(self.n_cells)
+        ]
         cell = tf.nn.rnn_cell.MultiRNNCell(cells)
         return cell
 

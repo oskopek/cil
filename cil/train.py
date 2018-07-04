@@ -121,7 +121,8 @@ elif FLAGS.model == "StackRNN":
 else:
     raise ValueError(f"Unknown model {FLAGS.model}.")
 
-expname = f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}_ttfull'
+expname = f'epochs{FLAGS.epochs}-bs{FLAGS.batch_size}{"-" + str(FLAGS.exp) if FLAGS.exp else ""}'
+expname = f'{expname}_ttfull'
 
 network = net_class(
     rnn_cell=FLAGS.rnn_cell,
@@ -140,8 +141,5 @@ network = net_class(
     seed=FLAGS.seed)
 
 # Train
-network.train(
-    data,
-    epochs=FLAGS.epochs,
-    batch_size=FLAGS.batch_size)
+network.train(data, epochs=FLAGS.epochs, batch_size=FLAGS.batch_size)
 print("End.")

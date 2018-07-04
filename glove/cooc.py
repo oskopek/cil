@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 # Code from the CIL excercise.
 
-from scipy.sparse import *    # this script needs scipy >= v0.15
-import numpy as np
+from scipy.sparse import coo_matrix  # this script needs scipy >= v0.15
 import pickle
 
 
 def main():
     with open('vocab.pkl', 'rb') as f:
         vocab = pickle.load(f)
-    vocab_size = len(vocab)
 
     data, row, col = [], [], []
     counter = 1
-    #for fn in ['train_pos.txt', 'train_neg.txt']:
     for fn in ['train_sent.txt']:
         with open(fn, encoding="utf8", errors="ignore") as f:
             for line in f:

@@ -6,9 +6,7 @@ from .rnn import RNN
 
 
 class RNNCE(RNN):
-    def __init__(self, *args,
-                expname: str = "exp",
-                 **kwargs) -> None:
+    def __init__(self, *args, expname: str = "exp", **kwargs) -> None:
         super().__init__(*args, expname=f"charonly_{expname}", **kwargs)
 
     def build_model(self) -> Tuple[tf.Tensor, tf.Tensor, tf.Operation]:
