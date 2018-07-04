@@ -17,6 +17,10 @@ cd fastText-0.1.0
 make
 cd ..
 
+echo ''
+echo "Outputs are in: $dir/data_in"
+echo ''
+
 for i in `seq 1 5`; do
     echo "Run: $i"
     ./fastText-0.1.0/fasttext supervised -input twitter-datasets/fasttext_train_data.txt -output "model_$i"

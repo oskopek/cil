@@ -1,8 +1,9 @@
 import numpy as np
 import os
 
-TOTAL_LEN = 1_250_000
-TRAIN_LEN = 1_200_000
+
+TOTAL_LEN = 1250000
+TRAIN_LEN = 1200000
 
 twitter_dir = 'twitter-datasets'
 
@@ -35,11 +36,10 @@ def doc_generator(twitter_dir, dataset, include_label=False):
 def write_to_file(dset, twitter_dir, filename):
     with open(os.path.join(twitter_dir, filename), 'w') as f:
         for line, label in dset:
-            print(f'{int(label)},{line}', file=f)
+            print('{},{}'.format(int(label), line), file=f)
 
 train_set = list(doc_generator(twitter_dir, "train", include_label=True))
 eval_set = list(doc_generator(twitter_dir, "eval", include_label=True))
 
 write_to_file(train_set, twitter_dir, 'train_data.txt')
 write_to_file(eval_set, twitter_dir, 'eval_data.txt')
-
