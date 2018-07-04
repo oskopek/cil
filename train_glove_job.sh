@@ -1,7 +1,8 @@
 #/bin/bash
 set -e
 cd ..
-mkdir -p "/scratch/$USER/"
-cp -r cil "/scratch/$USER/"
-cd "/scratch/$USER/cil/glove"
+dir="/tmp/$USER"
+mkdir -p "$dir"
+cp -r cil "$dir/"
+cd "$dir/cil/glove"
 ./run.sh

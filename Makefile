@@ -51,7 +51,7 @@ glove-run:
 	cd glove && ./run.sh
 
 glove-job:
-	bsub -W 04:00 -n 8 -R "rusage[mem=3000, ngpus_excl_p=1]" ./train_glove_job.sh
+	bsub -W 04:00 -n 4 -R "rusage[mem=12000, ngpus_excl_p=1]" ./train_glove_job.sh
 
 cnn512:
 	cp cil/experiments/cnn512.py cil/flags.py
