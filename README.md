@@ -16,7 +16,7 @@ The following steps will prepare your environment to begin training and evaluati
 
 * For Tensorflow on CPU, change the `tensorflow-gpu` line in `requirements.txt` to `tensorflow`.
   * Do note that we expect the usual Linux utilities to be installed, f.e. `bash`, `wget`, etc.
-  * We also expect the executables `python` and `python3` to point to a Python 3.6 or newer version of Python.
+  * We also expect the executables `python` and `python3` to point to a Python 3.6 or newer version of Python, and `python2` to point to a Python 2.7+ version of Python 2.
 * For downloading the data (part of the setup process), please make sure to be on the ETH network.
 * After everything is ready, simply run: `make setup` in a terminal from the project root directory.
 
@@ -47,9 +47,15 @@ You may need to change paths in the beginning of scripts (especially for fasttex
 if you are not running the models on Leonhard.
 
 ```
+# GloVe
 make glove
-make transformer
+
+# FastText
 make fasttext
+
+# Transformer
+make transformer-train-serve # in one terminal
+make transformer-predict # after training finishes, in second terminal
 ```
 
 To run Transformer and FastText, please read on for some preconditions and requirements.
