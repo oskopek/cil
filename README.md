@@ -15,8 +15,8 @@ The report is located at: `report/report.pdf`.
 The following steps will prepare your environment to begin training and evaluating models.
 
 * For Tensorflow on CPU, change the `tensorflow-gpu` line in `requirements.txt` to `tensorflow`.
-** Do note that we expect the usual Linux utilities to be installed, f.e. `bash`, `wget`, etc.
-** We also expect the executables `python` and `python3` to point to a Python 3.6 or newer version of Python.
+  * Do note that we expect the usual Linux utilities to be installed, f.e. `bash`, `wget`, etc.
+  * We also expect the executables `python` and `python3` to point to a Python 3.6 or newer version of Python.
 * For downloading the data (part of the setup process), please make sure to be on the ETH network.
 * After everything is ready, simply run: `make setup` in a terminal from the project root directory.
 
