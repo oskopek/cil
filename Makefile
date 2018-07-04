@@ -44,8 +44,14 @@ transformer-train-serve:
 transformer-predict:
 	cd transformer && ./predict.sh
 
-glove:
+glove-setup:
+	cd glove && ./setup.sh
+
+glove-run:
 	cd glove && ./run.sh
+
+glove-job:
+	bsub -W 04:00 -n 8 -R "rusage[mem=3000, ngpus_excl_p=1]" ./train_glove_job.sh
 
 cnn512:
 	cp cil/experiments/cnn512.py cil/flags.py
@@ -58,4 +64,4 @@ fasttext:
 %:
 	@:
 
-.PHONY: setup clean train check job status output lstm128 lstm128_ce lstm128_we gru256 stacklstm transformer-train-serve transformer-predict glove cnn512 fasttext
+.PHONY: setup clean train check job status output lstm128 lstm128_ce lstm128_we gru256 stacklstm transformer-train-serve transformer-predict glove-setup glove-run glove-job cnn512 fasttext

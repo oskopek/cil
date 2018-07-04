@@ -48,7 +48,8 @@ if you are not running the models on Leonhard.
 
 ```
 # GloVe
-make glove
+make glove-setup
+make glove-run # or make glove-job
 
 # FastText
 make fasttext
