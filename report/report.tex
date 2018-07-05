@@ -10,7 +10,8 @@
 
 \usepackage{multirow}
 
-\newcommand{\TODO}[1]{\{\textbf{TODO: }\textcolor{red}{#1}\}}
+% Make TODOs an error by out commenting the command.
+%\newcommand{\TODO}[1]{\{\textbf{TODO: }\textcolor{red}{#1}\}}
 \usepackage{pdfpages}
 
 \IEEEoverridecommandlockouts %Enables \thanks to be used again
@@ -39,13 +40,13 @@
 \maketitle%
 
 \begin{abstract}
-Sentiment analysis is a key stepping stone on the path to natural language understanding. In this paper, we show that deep neural networks can learn to classify sentiment even on very short and noisy texts without any preprocessing, by evaluating our models on the Twitter dataset and obtaining competitive results (88.5\% test set accuracy). We investigated the performance of different models Recurrent and Convolutional Neural Network based models on the binary sentiment classification problem and compared all our approaches to simpler baselines.
+Sentiment analysis is a key stepping stone on the path to natural language understanding. In this paper, we show that deep neural networks can learn to classify sentiment even on very short and noisy texts with almost no preprocessing, by evaluating our models on the Twitter dataset and obtaining competitive results (88.5\% test set accuracy). We investigated the performance of different Recurrent and Convolutional Neural Network based models on the binary sentiment classification problem and compared all our approaches to simpler baselines.
 \end{abstract}
 
 \section{Introduction}
 With the rise of Internet technologies, micro-blogging sites like Twitter have became increasingly popular to share and discuss information and express personal opinions. Used by millions of people on a daily basis, Twitter has become a source of data and offers huge opportunities for analysis. One of many applications is for example market analysis: how users perceive certain companies' products. Due to the large amount of data, reliable automated sentiment analysis is essential to be able to process and extract information from it efficiently. Recent developments in machine learning, like deep neural networks have shown promising results when performing sentiment analysis. However, there is still room for improvement, which is what we want to investigate in this paper. In our task, we classify tweets based on positive or negative sentiment.
 
-Tweets are short messages on Twitter which were originally limited to a length of 140 characters. Due to this length limitation and the fact that it is a fast-paced micro-blogging platform, most people use abbreviations, emoticons, hashtags, or ``@username'' to refer to other users. The dataset is therefore relatively structured and allows us to determine sentiment by checking emoticons occuring in tweets. Tweets with a ``:)'' smiley are considered to be positive tweets while negative tweets contain a ``:('' smiley. This allows us to label the data automatically as the smilies are removed from the training data and used as a label. Determining tweet sentiment simply based on an emoticon contained in the tweet introduces some noise to the labels, as there sometimes is not a direct correlation between sentiment and smiley (e.g.~irony, sarcasm, etc.). On the other hand, the use of colloquial language makes this task different from analyzing text from books or articles, and reflects the rough real world conditions of language use. 
+Tweets are short messages on Twitter which were originally limited to a length of 140 characters. Due to this length limitation and the fact that it is a fast-paced micro-blogging platform, most people use abbreviations, emoticons, hashtags, or ``@username'' to refer to other users. The dataset is therefore relatively structured and allows us to determine sentiment by checking emoticons occurring in tweets. Tweets with a ``:)'' smiley are considered to be positive tweets while negative tweets contain a ``:('' smiley. This allows us to label the data automatically as the smilies are removed from the training data and used as a label. Determining tweet sentiment simply based on an emoticon contained in the tweet introduces some noise to the labels, as there sometimes is not a direct correlation between sentiment and smiley (e.g.~irony, sarcasm, \ldots). On the other hand, the use of colloquial language makes this task different from analyzing text from books or articles, and reflects the rough real world conditions of language use. 
 
 For this project, we designed and implemented multiple machine learning models for sentiment analysis. The results are evaluated based on classification accuracy.
 Our contributions are the following:
@@ -56,9 +57,11 @@ Our contributions are the following:
 \end{enumerate}
 
 \section{Related work}
-Sentiment analysis is one the most basic text classification tasks, and therefore, has been a subject of interest to many researchers \cite{TextCNN,mozetivc2016multilingual,transformer,twitter_preprocessing,CharTextCNN}. While part of the research focused on data preprocessing \cite{twitter_preprocessing}, others were more concerned with the classification model itself \cite{TextCNN}.
+Sentiment analysis is one the most basic text classification tasks, and therefore, has been a subject of interest to many researchers
+\cite{TextCNN,mozetivc2016multilingual,transformer,twitter_preprocessing,CharTextCNN}. 
+While part of the research focused on data preprocessing \cite{twitter_preprocessing}, others were more concerned with the classification model itself \cite{TextCNN}.
 
-Before deep learning models, researchers extracted features from the text and ran a binary classifier on these features \TODO{Find paper that does this.}. Another simple approach was to sum or average learned word embeddings and classify them with standard machine learning algorithms, as recommended in the CIL course tutorial.
+Before deep learning models, researchers extracted features from the text and ran a binary classifier on these features \cite{features}, as recommended in the CIL course tutorial.
 
 With the recent success of deep neural networks in natural language processing problems, researchers tackled sentiment analysis by applying various convolutional \cite{TextCNN} and recurrent neural networks \cite{rnn} to the task. 
 
@@ -70,7 +73,8 @@ We use several different approaches to classify sentiment. In this section, we b
 
 \begin{figure}
 \includegraphics[width=0.48\textwidth]{./rnn}
-\caption{Sketch of our recurrent neural network architecture LSTM128. Equal colors indicate shared weights. $x\_$ represent individual character embeddings, $w\_$ represent word embeddings, and $ce\_$ represent character-based word embeddings.}
+\caption{Sketch of our recurrent neural network architecture LSTM128. Equal colors indicate shared weights. $x\_$ represent individual character embeddings, $w\_$ represent word embeddings, and $ce\_$ represent character-based word embeddings.
+The $\otimes$ symbol indicates concatenation.}
 \label{fig:arch}
 \end{figure}
 
@@ -96,17 +100,18 @@ We also experimented with more heavy preprocessing similar to \cite{twitter_prep
 \subsection{RNN models}
 Recurrent neural networks are one of the most used network architectures for natural language processing tasks such as machine translation, language modeling, and text classification.
 
-Our model architecture is depicted in Figure~\ref{fig:arch}. First, we run a bi-directional RNN on each of the tweet words' embedded characters. We concatenate the final hidden states with randomly initialized whole-word embeddings, and use the concatenated vectors as the final word embeddings for the next layer. Another bi-directional RNN network is run on the final word embeddings and its hidden states are fed into two 256-unit fully connected layers with ReLU activation functions. Finally, we append a fully connected layer with Softmax that classifies into positive and negative labels,
+Our model architecture is depicted in Figure~\ref{fig:arch}. First, we run a bi-directional RNN on each of the tweet words' embedded characters. We concatenate the final hidden states with randomly initialized whole-word embeddings, and use the concatenated vectors as the final word embeddings for the next layer.
+Another bi-directional RNN network is run on the final word embeddings and its hidden states are fed into two 256-unit fully connected layers with ReLU activation functions and dropout \cite{dropout1,dropout2} in between them (with keep probability 0.5). Finally, we append a fully connected layer with Softmax that classifies into positive and negative labels,
 and train the network using a cross-entropy loss function. 
 
-We use only two RNN cells with dimensionality of the hidden state(s) 128, one for the character RNN and one for the word RNN. A single cell is used for both directions. Our character and word embeddings have a dimensionality 200. 
+We use only two RNN cells with dimensionality of the hidden state(s) 128, one for the character RNN and one for the word RNN. A single cell is used for both directions. Our character and word embeddings have 200 dimensions. 
 
 We also briefly experimented with both Luong \cite{luong} and Bahdanau \cite{bahdanau} attention, but only observed higher training times and equivalent performance to models without attention.
 
 The performance of the model depends largely on the recurrent cell. Thus, we ran the described architecture with minor changes (each described below) and report the performance.
 
 \subsubsection{LSTM128}
-Long-Short-Term-Memory \cite{lstm} cells are the most frequently used recurrent units used to process text. They are well-known for their ability to capture long-range contextual features in text. In our implementation, the cell has a dimensionality 128, and we concatenate both the cell and hidden states of the final cell before passing them to the fully-connected layers.
+Long-Short-Term-Memory \cite{lstm} cells are the most frequently used recurrent units used to process text. They are well-known for their ability to capture long-range contextual features in text. In our implementation, the cell's hidden state has 128 dimensions, and we concatenate both final cell state and final hidden state of the cell. Then we concatenate the forward and backward states of the bi-directional RNN and pass the result to the fully-connected layers.
 
 \subsubsection{GRU256}
 Gated Recurrent Unit \cite{gru} has proven to be the best compromise of learning capabilities and computational complexity. It contains less gating (only one hidden state) than the more popular and older LSTM cell. Therefore, we ran an experiment in which we replaced the LSTM cell with a GRU cell of dimensionality 256.
@@ -118,13 +123,13 @@ In this experiment, we removed the first RNN network. That way, we completely ig
 Conversely, we only use the character based part computed by the first RNN here. This enforces a more hierarchical and end-to-end learned model.
 
 \subsubsection{Stacked LSTM}
-To increase the model capacity (its power to learn), we stack multiple LSTM cells on top of each other, which is a common practice in machine translation models \cite{zeroshot}. For our purposes, we use two LSTMs, with dropout 0.5 \cite{dropout1,dropout2} on all individual LSTM cell inputs and outputs.
+To increase the model's capacity (its power to learn), we stack multiple LSTM cells on top of each other, which is a common practice in machine translation models \cite{zeroshot}. For our purposes, we use two LSTMs, with dropout with a keep probability of 0.5 on all individual LSTM cell inputs and outputs.
 
 
 \subsection{Other models}
 
 \subsubsection{TextCNN}
-Recurrent neural networks are well known for their capabilities to capture long context. However, tweets are very short and therefore a limited fixed receptive field is most likely capable of learning the text sentiment. Thus, we replaced the word RNN with convolutions similar to \cite{TextCNN}. We used kernel sizes 3, 4, 5, and 7, each with 512 channels.
+Recurrent neural networks are well known for their capabilities to capture long context. However, tweets are very short and therefore a limited fixed receptive field is most likely capable of learning the text sentiment. Thus, we replaced the word RNN with convolutions similar to \cite{TextCNN}. We used kernel sizes 3, 4, 5, and 7, each with 512 channels (model implementation is called CNN512).
 
 \subsubsection{Transformer Tiny}
 Transformer \cite{transformer} is a state of the art method in machine translation. It uses gating similar to RNN cells, while processing tokens in parallel similar to CNNs. We utilized the Tensor2Tensor \cite{tensor2tensor} implementation, and trained the ``tiny'' version (2 hidden layers) of the model's encoder for classification.
@@ -145,18 +150,21 @@ All code is available in the repository\footnote{\url{https://github.com/oskopek
 To achieve reproducible results, we trained all experiments with the same fixed random seed. Moreover, we split the data into a training and evaluation set which we used for all the experiments.
 The evaluation set contained 100 000 tweets, and the remaining 2.4 million tweets were used for training.
 
-All neural network experiments were trained on the Leonhard ETHZ cluster on Nvidia GeForce GTX 1080 Ti.
-All of these experiments ran for a maximum of 24 hours, 15 epochs,
+All neural network experiments were trained on the Leonhard ETHZ cluster on a single Nvidia GeForce GTX 1080 Ti GPU.
+All of our experiments ran for a maximum of 24 hours, 15 epochs,
 with batch size 32.
 We evaluated on the full evaluation set every 7500 steps (independent on the batch size), and as the final predictions, used the ones that were created at the point where the model had the highest evaluation accuracy.
 Most models obtained best results around epochs 9--12, which corresponds
 to about 21 hours in training time.
-
 The Stacked LSTM ran with batch size 256 for about 12 hours.
-The Transformer \TODO{Lukas finish this}. All baselines
-ran for a very short time on commodity CPU hardware.
-Due to the instability of FastText with respect to the random seed,
+
+The Transformer was trained for 40 000 steps in mini-batches of 8 000 words. The model trains for about an hour, which is significantly faster than all of the RNN based models.
+
+FastText ran for a very short time on commodity CPU hardware.
+Due to its instability, with respect to the random seed,
 we perform 5 runs, and report the standard deviations. 
+
+Our GloVe implementation consumes a lot of memory (peak at $\approx$ 40 GB), and runs for about 2-3 hours on a CPU.
   
 \section{Results}
 
@@ -177,9 +185,9 @@ Satisfaction &  & 88.78 & \textbf{88.62}\\
 \midrule
 LSTM128 & 88.49 & 87.90 & 87.82\\
 GRU256 & 88.45 & 87.66 & 87.52\\
-LSTM128 w/o WE & ? & ? & ?\\
+LSTM128 w/o WE & 87.88 & 86.98 & 86.56\\
 LSTM128 w/o CE & 88.18 & 87.82 & \textbf{87.90}\\
-StackLSTM & \textbf{88.58} & 88.06 & 87.68\\
+Stacked LSTM & \textbf{88.58} & 88.06 & 87.68\\
 TextCNN & 87.71 & 87.70 & 87.10\\
 Transformer Tiny & 86.00 & 85.34 & 83.84\\
 Ensemble Majority Vote & & \textbf{88.54} & 87.78\\
@@ -197,14 +205,14 @@ In Table~\ref{tab:params}, we present the number of parameters for our models (i
 \toprule
 Model & Parameters\\
 \midrule
-LSTM128 & ?\\
-GRU256 & ?\\
-LSTM128 w/o WE & ?\\
-LSTM128 w/o CE & ?\\
-StackLSTM & ?\\
-TextCNN & ?\\
-Transformer Tiny & \TODO{Lukas}\\
-Ensemble Majority Vote & ?SUM?\\
+LSTM128 & 4.8 M\\
+GRU256 & 5.3 M\\
+LSTM128 w/o WE & 0.7 M\\
+LSTM128 w/o CE & 4.4 M\\
+Stacked LSTM & 21.1 M\\
+TextCNN & 11.7 M\\
+Transformer Tiny & 1.5 M\\
+Ensemble Majority Vote & $\approx$ 51.1 M\\
 \bottomrule
 \end{tabular}
 \caption{Number of parameters of our models.}\label{tab:params}
@@ -217,8 +225,7 @@ We can observe that all our models perform consistently better than all baseline
 An interesting observation is that some models generalize to the test set better than others. For example, the accuracy of TextCNN only drops marginally on the test sets compared to the evaluation set, as opposed to all our RNN models. Generally, we observe that the simpler the model, the better it generalizes (among neural models, e.g.~LSTM128 w/o WE, LSTM128 w/o CE).
 
 As can be seen in Table~\ref{tab:params},
-the number of parameters in a model has limited effect on its performance. We can see that above a model complexity, adding more parameters only helps marginally.
-\TODO{(oskopek): Describe/fix/make more concrete the description of model perf based on number of params.}
+the number of parameters in a model has limited effect on its performance. We can see that above a model complexity, adding more parameters increases the performance; however only marginally. Based on the complexity of the model LSTM model comes out clearly as the best. Despite weaker performance, Transformer's scores are impressive considering the duration of training ($\approx 20\times$\,faster) and lower parameter count. Given enough parameter tweaking, the model has big potential.
 
 \begin{table}\centering
 \includegraphics[width=0.48\textwidth]{./ensemble_tablev2}
@@ -228,9 +235,8 @@ the number of parameters in a model has limited effect on its performance. We ca
 
 
 An interesting comparison of how surprisingly diverse the models we trained are 
-can be seen in Table~\ref{tab:agreement}. Interestingly, our well  performing models (LSTM128, CNN512, and StackLSTM) only agree with each other in about 94\% of the cases (pairwise).
+can be seen in Table~\ref{tab:agreement}. Interestingly, our well  performing models (LSTM128, TextCNN, and Stacked LSTM) only agree with each other in about 94\% of the cases (pairwise).
 We can also see the effects of lower performance of the Transformer and GloVe+RF models on the pairwise agreement with other models. 
-\TODO{Expand this if we add FastText and GRU256, might be interesting to compare them to Glove and LSTM, respectively.}
 
 \begin{figure}\centering
 \includegraphics[width=0.5\textwidth]{./ensemble_diag}
@@ -254,3 +260,4 @@ We would like to thank the Data Analytics Lab and ETH~Z\"{u}rich for computation
 
 \include{decl}
 \end{document}
+
