@@ -183,7 +183,7 @@ def main():
     if useLen:
         embedding_dim = embedding_dim - 1
     test_data = []
-    read_input_data('test_data.txt', test_data, glove_words_embeddings, vocab, True, None)
+    read_input_data('../data_in/twitter-datasets/test_data.txt', test_data, glove_words_embeddings, vocab, True, None)
     to_predict_data = np.array(test_data)
     print(to_predict_data.shape)
     predicted_results = classifier.predict(to_predict_data)
