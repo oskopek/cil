@@ -81,12 +81,12 @@ The $\otimes$ symbol indicates concatenation.}
 \subsection{Baselines}
 %In order to compare our models, we implemented three baselines.
 
-\subsubsection{Glove + Logistic regression}
-This baseline is taken from the CIL lecture. We use GloVe word embeddings \cite{pennington2014glove} and average them for each tweet. On the resulting vector, we apply logistic regression. For this baseline, we either compute the Glove embeddings based on our training data by using scripts from the CIL tutorial, or use precomputed ones from Stanford University\footnote{\url{https://nlp.stanford.edu/projects/glove/}}.
+\subsubsection{GloVe + Logistic regression}
+This baseline is taken from the CIL lecture. We use GloVe word embeddings \cite{pennington2014glove} and average them for each tweet. On the resulting vector, we apply logistic regression. For this baseline, we either compute the GloVe embeddings based on our training data by using scripts from the CIL tutorial, or use precomputed ones from Stanford University\footnote{\url{https://nlp.stanford.edu/projects/glove/}}.
 Both variants of the embeddings have 200 dimensions.
 
-\subsubsection{Glove + Random Forest}
-Similarly to the previous baseline, we average the GloVe word embeddings for each tweet. However, this time we use a Random Forest (RF) classifier \cite{random-forests} with 128 trees. We report scores for evaluation using both the self trained and Stanford pre-trained Glove embeddings. The same dimensionality as above was used.
+\subsubsection{GloVe + Random Forest}
+Similarly to the previous baseline, we average the GloVe word embeddings for each tweet. However, this time we use a Random Forest (RF) classifier \cite{random-forests} with 128 trees. We report scores for evaluation using both the self trained and Stanford pre-trained GloVe embeddings. The same dimensionality as above was used.
 
 \subsubsection{FastText}
 FastText \cite{joulin2017bag} is a command-line tool developed by Facebook AI Research. As it is simple to set up and runs fast, we decided to run it on our dataset and consider it as one of the baselines. In one step, it learns word embeddings in an unsupervised way, and trains a simple classifier on them. 
@@ -139,7 +139,7 @@ Motivated by most data science competitions, an ensemble of several strong model
 
 \subsection{Implementation}
 All neural network models are implemented in TensorFlow \cite{tensorflow}, and trained with the Adam optimizer \cite{adam} with a learning rate of $3 \cdot 10^{-4}$. All variables were initialized with Glorot initialization \cite{glorot2010understanding}.
-The GloVe embedding implementation was adapted from the coding exercise solution to CIL tutorial 6. When training GloVe embeddings, we train for 20 epochs. For the Random Forests and Logistic Regression, we used the NumPy \cite{numpy} and scikit-learn \cite{scikit-learn} Python libraries.
+The GloVe embedding implementation was adapted from the coding exercise solution of CIL tutorial 6. When training GloVe embeddings, we train for 20 epochs. For the Random Forests and Logistic Regression, we used the NumPy \cite{numpy} and scikit-learn \cite{scikit-learn} Python libraries.
 For FastText and Transformer, we used the original implementations available online\footnote{\url{https://fasttext.cc/}, \url{https://github.com/tensorflow/tensor2tensor}}.
 The ensemble majority voting was done in a simple spreadsheet.
 
@@ -153,10 +153,11 @@ The evaluation set contained 100 000 tweets, and the remaining 2.4 million tweet
 All neural network experiments were trained on the Leonhard ETHZ cluster on a single Nvidia GeForce GTX 1080 Ti GPU.
 All of our experiments ran for a maximum of 24 hours, 15 epochs,
 with batch size 32.
-We evaluated on the full evaluation set every 7500 steps (independent on the batch size), and as the final predictions, used the ones that were created at the point where the model had the highest evaluation accuracy.
+Every 7500 steps, we evaluated on the full evaluation set (independently of the batch size). For the final predictions, we used the ones that were created at the point when the model had the highest evaluation accuracy.
+
 Most models obtained best results around epochs 9--12, which corresponds
-to about 21 hours in training time.
-The Stacked LSTM ran with batch size 256 for about 12 hours.
+to about 21 hours of training time.
+The Stacked LSTM ran with a batch size of 256 for about 12 hours.
 
 The Transformer was trained for 40 000 steps in mini-batches of 8 000 words. The model trains for about an hour, which is significantly faster than all of the RNN based models.
 
@@ -164,8 +165,8 @@ FastText ran for a very short time on commodity CPU hardware.
 Due to its instability, with respect to the random seed,
 we perform 5 runs, and report the standard deviations. 
 
-Our GloVe implementation consumes a lot of memory (peak at $\approx$ 40 GB), and runs for about 2-3 hours on a CPU.
-  
+Our GloVe implementation consumes a lot of memory (peak at $\approx$ 40 GB), and runs for about 12 hours on 4 CPUs (all four experiments in total).
+
 \section{Results}
 
 \begin{table}\centering
@@ -196,7 +197,7 @@ Ensemble Majority Vote & & \textbf{88.54} & 87.78\\
 \caption{Evaluation and test set results. Values left blank are unknown. Acc.~means accuracy, LR~is logistic regression, WE/CE are word/character embeddings respectively, and RF denotes a Random Forest. The top section describes baselines that we ran on our data split. Middle section contains the two top teams on Kaggle for this project. Bottom section shows our results. Values that have confidence intervals were unstable enough to be have to be run 5 times.}\label{tab:results}
 \end{table}
 
-The results of all our experiments are summarized in Table~\ref{tab:results}. The reported evaluation accuracy is the best one obtained during training (and hence the version of the model with which we submitted the predictions to Kaggle). The public and private test scores correspond to the scores those submissions obtained on the Kaggle data splits. The values left blank are unknown.
+The results of all our experiments are summarized in Table~\ref{tab:results}. The reported evaluation accuracy is the best one obtained during training (and hence this is the version of the model we used to submit predictions to Kaggle). The public and private test scores correspond to the scores those submissions obtained on the Kaggle data splits. The values left blank are unknown.
 
 In Table~\ref{tab:params}, we present the number of parameters for our models (including the learned embeddings).
 
@@ -224,8 +225,7 @@ We can observe that all our models perform consistently better than all baseline
 
 An interesting observation is that some models generalize to the test set better than others. For example, the accuracy of TextCNN only drops marginally on the test sets compared to the evaluation set, as opposed to all our RNN models. Generally, we observe that the simpler the model, the better it generalizes (among neural models, e.g.~LSTM128 w/o WE, LSTM128 w/o CE).
 
-As can be seen in Table~\ref{tab:params},
-the number of parameters in a model has limited effect on its performance. We can see that above a model complexity, adding more parameters increases the performance; however only marginally. Based on the complexity of the model LSTM model comes out clearly as the best. Despite weaker performance, Transformer's scores are impressive considering the duration of training ($\approx 20\times$\,faster) and lower parameter count. Given enough parameter tweaking, the model has big potential.
+As can be seen in Table~\ref{tab:params}, our models had very different numbers of parameters but perform very similarly in terms of accuracy. Adding more parameters increases the performance, but only marginally. LSTM models clearly show the best trade-off between model complexity and performance. Despite weaker performance, the Transformer's scores are impressive considering the duration of training ($\approx 20\times$\,faster) and lower parameter count. Given enough parameter tweaking, the model has considerable potential.
 
 \begin{table}\centering
 \includegraphics[width=0.48\textwidth]{./ensemble_tablev2}
@@ -233,27 +233,28 @@ the number of parameters in a model has limited effect on its performance. We ca
 \end{table}
 
 
-
-An interesting comparison of how surprisingly diverse the models we trained are 
-can be seen in Table~\ref{tab:agreement}. Interestingly, our well  performing models (LSTM128, TextCNN, and Stacked LSTM) only agree with each other in about 94\% of the cases (pairwise).
-We can also see the effects of lower performance of the Transformer and GloVe+RF models on the pairwise agreement with other models. 
+Table~\ref{tab:agreement} shows an interesting comparison how much our models agree on the predictions and reveals how surprisingly diverse our trained models are.
+Interestingly, our well  performing models (LSTM128, TextCNN, and Stacked LSTM) only agree with each other (pairwise) in about 94\% of the cases.
+We can also see the effects of lower performance of the Transformer and GloVe+RF models on the pairwise agreement with other models.
 
 \begin{figure}\centering
-\includegraphics[width=0.5\textwidth]{./ensemble_diag}
+\includegraphics[width=0.48\textwidth]{./ensemble_diag}
 \caption{Bar plot of the number of models that ended up voting for the final majority result.}\label{fig:diag}
 \end{figure}
 
-Our ensemble model leverages this diversity. The majority voting results are summarized in Figure~\ref{fig:diag}. We can see that in a total of about 26.5\% of the cases, at least one model was unsure about the chosen prediction.
+Our ensemble model leverages this diversity. The majority voting results are summarized in Figure~\ref{fig:diag}. In about 26.5\% of the cases, at least one model chose to predict a different class than the rest.
 
 \section{Summary}
-To summarize, we have presented several approaches that perform competitively on the task of Twitter sentiment classification.
-They consistently outperform the baselines, behave in a stable fashion during training, are simple to implement, and need almost no preprocessing (on top of the already provided and processed data).
+We have presented several approaches that perform competitively on the task of Twitter sentiment classification.
+They consistently outperform the baselines, behave in a stable fashion during training, are comparatively simple to implement, and need almost no preprocessing (on top of the already provided and processed data).
 
 We have also shown that the models are diverse, and combining them in an ensemble reduces prediction variance and thus improves generalization.
 
 \section*{Acknowledgements}
 
 We would like to thank the Data Analytics Lab and ETH~Z\"{u}rich for computational resources for this project on the Leonhard cluster, and answering all our questions on Piazza or otherwise.
+
+\newpage
 
 \bibliographystyle{IEEEtran}
 \bibliography{report}
