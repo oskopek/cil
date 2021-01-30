@@ -4,5 +4,5 @@ numpy
 scipy
 sklearn
 tensorboard==1.7.0
-tensorflow-gpu==1.7.0
+tensorflow-gpu==2.4.0
 tqdm
