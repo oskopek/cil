@@ -1,4 +1,7 @@
 # Computational Intelligence Lab 2018 -- Text Sentiment Classification
+
+![Python package](https://github.com/oskopek/cil/workflows/Python%20package/badge.svg)
+
 ### Larissa Laich, Lukas Jendele, Ondrej Skopek, Michael Wiegner
 Department of Computer Science, ETH Zurich, Switzerland
 
